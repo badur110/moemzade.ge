@@ -3,8 +3,8 @@ const SHEET_ID   = '1weL4w0BzXGrYPIczj0kKYFdvE615OIMKSzIpt9Q1Yu0';
 const SHEET_NAME = 'teachers';
 const PAGE_SIZE  = 35;
 
-const CATEGORIES = ['','🎵 მუსიკა','💃 ცეკვა','💅 სილამაზე','🎓 სასკოლო საგნები','💻 ტექნოლოგია','🎨 შემოქმედება','🌍 ენები','🔧 ხელსაქმე','🏋️ სპორტი','🍳 კულინარია','🎭 თეატრი','📦 სხვა'];
-const CAT_LABELS = ['ყველა სფერო','მუსიკა','ცეკვა','სილამაზე','სასკოლო','ტექნოლოგია','შემოქმედება','ენები','ხელსაქმე','სპორტი','კულინარია','თეატრი','სხვა'];
+const CATEGORIES = ['','🎵 მუსიკა','💃 ცეკვა','💅 სილამაზე','🎓 სასკოლო საგნები','💻 ტექნოლოგია','🎨 შემოქმედება','🌍 ენები','🔧 ხელსაქმე','🏋️ სპორტი','🍳 კულინარია','🎭 თეატრი','🚗 მართვა','📦 სხვა'];
+const CAT_LABELS = ['ყველა სფერო','მუსიკა','ცეკვა','სილამაზე','სასკოლო','ტექნოლოგია','შემოქმედება','ენები','ხელსაქმე','სპორტი','კულინარია','თეატრი','მართვა','სხვა'];
 const REGIONS    = ['','თბილისი','კახეთი','შიდა ქართლი','ქვემო ქართლი','მცხეთა-მთიანეთი','სამცხე-ჯავახეთი','იმერეთი','რაჭა-ლეჩხუმი','გურია','სამეგრელო-ზემო სვანეთი','აჭარა','აფხაზეთი','ონლაინ'];
 const FORMATS    = ['','პირადად','ონლაინ','ორივე'];
 const FMT_LABELS = ['ნებისმიერი','პირადად','ონლაინ','ორივე'];
@@ -105,7 +105,7 @@ function filterTeachers(arr, cat, reg, fmt, minP, maxP, q) {
   });
 }
 
-// ===================== FILTER PANEL (teachers page) =====================
+// ===================== FILTER PANEL =====================
 function openFilter(type) {
   activeFilter = type;
   tempVal = type==='cat'?selectedCat:type==='reg'?selectedReg:selectedFmt;
@@ -165,7 +165,6 @@ async function initTeachers() {
   if(selectedCat){const idx=CATEGORIES.findIndex(c=>stripEmoji(c)===selectedCat);document.getElementById('pillCatLabel').textContent=idx>0?CAT_LABELS[idx]:selectedCat;document.getElementById('pillCat').classList.add('active');}
   if(selectedReg){document.getElementById('pillRegLabel').textContent=selectedReg;document.getElementById('pillReg').classList.add('active');}
 
-  // Search by name
   const searchEl = document.getElementById('teacherSearch');
   if(searchEl){
     searchEl.addEventListener('input', e=>{
@@ -174,7 +173,6 @@ async function initTeachers() {
     });
   }
 
-  // Price slider
   const minSlider=document.getElementById('priceMin');
   const maxSlider=document.getElementById('priceMax');
   const priceLabel=document.getElementById('priceLabel');
@@ -194,7 +192,7 @@ async function initTeachers() {
 }
 
 // ===================== INDEX INIT =====================
-const INDEX_CATS=['ყველა კატეგორია','🎵 მუსიკა','💃 ცეკვა','💅 სილამაზე','🎓 სასკოლო საგნები','💻 ტექნოლოგია','🎨 შემოქმედება','🌍 ენები','🔧 ხელსაქმე','🏋️ სპორტი','🍳 კულინარია','🎭 თეატრი','📦 სხვა'];
+const INDEX_CATS=['ყველა კატეგორია','🎵 მუსიკა','💃 ცეკვა','💅 სილამაზე','🎓 სასკოლო საგნები','💻 ტექნოლოგია','🎨 შემოქმედება','🌍 ენები','🔧 ხელსაქმე','🏋️ სპორტი','🍳 კულინარია','🎭 თეატრი','🚗 მართვა','📦 სხვა'];
 const INDEX_REGS=['ყველა რეგიონი','📍 თბილისი','📍 კახეთი','📍 შიდა ქართლი','📍 ქვემო ქართლი','📍 მცხეთა-მთიანეთი','📍 სამცხე-ჯავახეთი','📍 იმერეთი','📍 რაჭა-ლეჩხუმი','📍 გურია','📍 სამეგრელო-ზემო სვანეთი','📍 აჭარა','📍 აფხაზეთი','🌐 ონლაინ'];
 
 function buildDropdown(ddId,items,selId,stateKey){
@@ -243,7 +241,6 @@ async function initIndex() {
 
   allTeachers=await fetchTeachers();
 
-  // Animated stats
   const sc=document.getElementById('statCount');
   if(sc) animateCounter(sc, allTeachers.length, '+');
 
@@ -301,6 +298,5 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(page==='index')    initIndex();
   if(page==='teachers') initTeachers();
   if(page==='profile')  initProfile();
-  // General scroll reveal for any page
   setTimeout(initScrollReveal, 200);
 });
