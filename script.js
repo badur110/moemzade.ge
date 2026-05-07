@@ -43,7 +43,7 @@ async function fetchTeachers() {
       online:    row.c[10]?.v||'',
       photo:     row.c[11]?.v||'',
       approved:  String(row.c[13]?.v||'').toLowerCase(),
-    })).filter(t => t.name && String(t.id)!=='001' && String(t.id)!=='1' && t.approved==='კი');
+    })).filter(t => t.name && t.approved === 'კი');
   } catch(e){ console.error(e); return []; }
 }
 
