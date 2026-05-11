@@ -206,6 +206,52 @@
     .mobile-menu.open { display:flex; }
     .btn-primary { background:#0F6E56; color:#fff!important; padding:8px 16px; border-radius:8px; font-size:13px; font-weight:500; }
 
+
+    /* ── CATEGORIES NEW ── */
+    .cats-grid-new {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+    }
+    .cat-card-new {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: #fff;
+      border: 1px solid #ebebE6;
+      border-radius: 16px;
+      padding: 16px 8px;
+      cursor: pointer;
+      transition: all .18s ease;
+      text-align: center;
+    }
+    .cat-card-new:hover {
+      border-color: #0F6E56;
+      background: #F0FDF8;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(15,110,86,.1);
+    }
+    .cn-icon {
+      font-size: 24px;
+      line-height: 1;
+    }
+    .cn-name {
+      font-size: 11px;
+      font-weight: 600;
+      color: #444;
+      line-height: 1.2;
+    }
+    .cat-card-new:hover .cn-name { color: #0F6E56; }
+    @media(max-width:700px){
+      .cats-grid-new { grid-template-columns: repeat(4,1fr); gap:8px; }
+      .cat-card-new { padding: 14px 6px; border-radius: 12px; }
+      .cn-icon { font-size: 20px; }
+    }
+    @media(max-width:400px){
+      .cats-grid-new { grid-template-columns: repeat(3,1fr); }
+    }
     /* ── LOADING ── */
     .loading-state,.empty-state { grid-column:1/-1; text-align:center; padding:40px; color:#aaa; font-size:14px; }
     .container { max-width:1100px; margin:0 auto; padding:0 20px; }
@@ -334,21 +380,21 @@
         <h2 class="sec-title">კატეგორიები</h2>
         <a href="teachers.html" class="sec-link">ყველა →</a>
       </div>
-      <div class="cats-grid">
-        <div class="cat-card" onclick="goSearch('მუსიკა')"><div class="cat-icon" style="background:#E1F5EE;">🎵</div><div class="cat-name">მუსიკა</div></div>
-        <div class="cat-card" onclick="goSearch('ცეკვა')"><div class="cat-icon" style="background:#FBEAF0;">💃</div><div class="cat-name">ცეკვა</div></div>
-        <div class="cat-card" onclick="goSearch('სილამაზე')"><div class="cat-icon" style="background:#FAEEDA;">💅</div><div class="cat-name">სილამაზე</div></div>
-        <div class="cat-card" onclick="goSearch('სასკოლო')"><div class="cat-icon" style="background:#EEEDFE;">🎓</div><div class="cat-name">სასკოლო</div></div>
-        <div class="cat-card" onclick="goSearch('ტექნოლოგია')"><div class="cat-icon" style="background:#E6F1FB;">💻</div><div class="cat-name">ტექნოლოგია</div></div>
-        <div class="cat-card" onclick="goSearch('შემოქმედება')"><div class="cat-icon" style="background:#EAF3DE;">🎨</div><div class="cat-name">შემოქმედება</div></div>
-        <div class="cat-card" onclick="goSearch('ენები')"><div class="cat-icon" style="background:#E1F5EE;">🌍</div><div class="cat-name">ენები</div></div>
-        <div class="cat-card" onclick="goSearch('ხელსაქმე')"><div class="cat-icon" style="background:#FAEEDA;">🔧</div><div class="cat-name">ხელსაქმე</div></div>
-        <div class="cat-card" onclick="goSearch('სპორტი')"><div class="cat-icon" style="background:#FBEAF0;">🏋️</div><div class="cat-name">სპორტი</div></div>
-        <div class="cat-card" onclick="goSearch('კულინარია')"><div class="cat-icon" style="background:#E6F1FB;">🍳</div><div class="cat-name">კულინარია</div></div>
-        <div class="cat-card" onclick="goSearch('თეატრი')"><div class="cat-icon" style="background:#EEEDFE;">🎭</div><div class="cat-name">თეატრი</div></div>
-        <div class="cat-card" onclick="goSearch('მართვა')"><div class="cat-icon" style="background:#E6F1FB;">🚗</div><div class="cat-name">მართვა</div></div>
-        <div class="cat-card" onclick="goSearch('ბიზნესი და ფინანსები')"><div class="cat-icon" style="background:#FAEEDA;">💼</div><div class="cat-name">ბიზნესი</div></div>
-        <div class="cat-card" onclick="goSearch('')"><div class="cat-icon" style="background:#EAF3DE;">📦</div><div class="cat-name">სხვა</div></div>
+      <div class="cats-grid-new">
+        <div class="cat-card-new" onclick="goSearch('მუსიკა')"><span class="cn-icon">🎵</span><span class="cn-name">მუსიკა</span></div>
+        <div class="cat-card-new" onclick="goSearch('ცეკვა')"><span class="cn-icon">💃</span><span class="cn-name">ცეკვა</span></div>
+        <div class="cat-card-new" onclick="goSearch('სილამაზე')"><span class="cn-icon">💅</span><span class="cn-name">სილამაზე</span></div>
+        <div class="cat-card-new" onclick="goSearch('სასკოლო საგნები')"><span class="cn-icon">🎓</span><span class="cn-name">სასკოლო</span></div>
+        <div class="cat-card-new" onclick="goSearch('ტექნოლოგია')"><span class="cn-icon">💻</span><span class="cn-name">ტექნოლოგია</span></div>
+        <div class="cat-card-new" onclick="goSearch('შემოქმედება')"><span class="cn-icon">🎨</span><span class="cn-name">შემოქმედება</span></div>
+        <div class="cat-card-new" onclick="goSearch('ენები')"><span class="cn-icon">🌍</span><span class="cn-name">ენები</span></div>
+        <div class="cat-card-new" onclick="goSearch('ხელსაქმე')"><span class="cn-icon">🔧</span><span class="cn-name">ხელსაქმე</span></div>
+        <div class="cat-card-new" onclick="goSearch('სპორტი და ჯანმრთელობა')"><span class="cn-icon">🏋️</span><span class="cn-name">სპორტი</span></div>
+        <div class="cat-card-new" onclick="goSearch('კულინარია')"><span class="cn-icon">🍳</span><span class="cn-name">კულინარია</span></div>
+        <div class="cat-card-new" onclick="goSearch('თეატრი და მედია')"><span class="cn-icon">🎭</span><span class="cn-name">თეატრი</span></div>
+        <div class="cat-card-new" onclick="goSearch('მართვა')"><span class="cn-icon">🚗</span><span class="cn-name">მართვა</span></div>
+        <div class="cat-card-new" onclick="goSearch('ბიზნესი და ფინანსები')"><span class="cn-icon">💼</span><span class="cn-name">ბიზნესი</span></div>
+        <div class="cat-card-new" onclick="goSearch('')"><span class="cn-icon">📦</span><span class="cn-name">სხვა</span></div>
       </div>
     </div>
   </section>
