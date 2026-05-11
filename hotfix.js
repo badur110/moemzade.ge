@@ -59,6 +59,7 @@
     style.textContent=`
       #sbInner, #sbCat, #sbReg, #sbFmt { overflow: visible !important; }
       #sbCat, #sbReg, #sbFmt { isolation: isolate; }
+
       #ddCat, #ddReg, #ddFmt {
         display: none;
         position: absolute;
@@ -75,7 +76,9 @@
         z-index: 99999;
         padding: 7px;
       }
+
       #ddCat.open, #ddReg.open, #ddFmt.open { display: block !important; }
+
       .dd-opt {
         display: flex;
         align-items: center;
@@ -89,14 +92,69 @@
         white-space: normal;
         line-height: 1.35;
       }
+
       .dd-opt:hover { background: #F2F7F4; color: #0F6E56; }
       .dd-opt.active { background: #E8F8F3; color: #0F6E56; font-weight: 700; }
+
       @media (min-width: 600px){
         #ddCat, #ddReg, #ddFmt { left: 0; right: auto; width: 270px; }
         #ddReg { width: 300px; }
       }
+
       @media (max-width: 599px){
-        #ddCat, #ddReg, #ddFmt { left: 12px; right: 12px; width: auto; max-height: 270px; }
+        body.dropdown-open {
+          overflow: hidden !important;
+        }
+
+        body.dropdown-open::before {
+          content: "";
+          position: fixed;
+          inset: 0;
+          background: rgba(250,250,249,.96);
+          z-index: 2147483000;
+        }
+
+        #sbCat, #sbReg, #sbFmt {
+          isolation: auto !important;
+        }
+
+        #ddCat, #ddReg, #ddFmt {
+          position: fixed !important;
+          top: 76px !important;
+          left: 14px !important;
+          right: 14px !important;
+          bottom: 18px !important;
+          width: auto !important;
+          min-width: 0 !important;
+          max-height: none !important;
+          overflow-y: auto !important;
+          background: #fff !important;
+          border: 1px solid #dfe4df !important;
+          border-radius: 22px !important;
+          box-shadow: 0 20px 60px rgba(15,45,38,.24) !important;
+          z-index: 2147483647 !important;
+          padding: 12px !important;
+        }
+
+        #ddCat.open, #ddReg.open, #ddFmt.open {
+          display: block !important;
+        }
+
+        .dd-opt {
+          font-size: 16px !important;
+          padding: 15px 16px !important;
+          border-radius: 14px !important;
+          background: #fff;
+          line-height: 1.35;
+          white-space: normal !important;
+        }
+
+        .dd-opt:hover,
+        .dd-opt.active {
+          background: #E8F8F3 !important;
+          color: #0F6E56 !important;
+          font-weight: 700;
+        }
       }
     `;
     document.head.appendChild(style);
@@ -167,7 +225,9 @@
       if(target) target.textContent=value?label:'ნებისმიერი';
       markActive('ddFmt', el);
     }
+
     document.querySelectorAll('.dropdown').forEach(x=>x.classList.remove('open'));
+    document.body.classList.remove('dropdown-open');
   };
 
   function markActive(id, el){
@@ -186,11 +246,18 @@
     addDropdownCss();
     setSearchOverflowVisible();
     fillDropdowns();
+
     const dd=document.getElementById(id);
     if(!dd) return;
+
     const was=dd.classList.contains('open');
     document.querySelectorAll('.dropdown').forEach(x=>x.classList.remove('open'));
-    if(!was) dd.classList.add('open');
+    document.body.classList.remove('dropdown-open');
+
+    if(!was){
+      dd.classList.add('open');
+      document.body.classList.add('dropdown-open');
+    }
   };
 
   window.doSearch=function(){
@@ -206,6 +273,7 @@
   function v(id){return (document.getElementById(id)?.value||'').trim()}
   function err(id,on){const e=document.getElementById(id);if(e)e.style.display=on?'block':'none'}
   function selectedFormat(){return document.querySelector('input[name="format"]:checked')?.value||''}
+
   function setStep(n){
     document.querySelectorAll('.step-panel').forEach(p=>p.classList.remove('active'));
     document.getElementById('step'+n)?.classList.add('active');
@@ -217,25 +285,51 @@
       document.getElementById('sn'+i)?.classList.toggle('done',i<n);
     });
   }
+
   window.goStep=function(n){
     if(n===2){
       let ok=true;
-      ['name','region','price'].forEach(id=>{const good=!!v(id);document.getElementById(id)?.classList.toggle('error',!good);err('err-'+id,!good);ok=ok&&good});
+      ['name','region','price'].forEach(id=>{
+        const good=!!v(id);
+        document.getElementById(id)?.classList.toggle('error',!good);
+        err('err-'+id,!good);
+        ok=ok&&good;
+      });
       const settlement=v('settlement')==='სხვა'?v('customSettlement'):v('settlement');
-      if(document.getElementById('settlement')){document.getElementById('settlement').classList.toggle('error',!settlement);err('err-settlement',!settlement);ok=ok&&!!settlement;}
-      const fmt=!!selectedFormat();err('err-format',!fmt);ok=ok&&fmt;
+      if(document.getElementById('settlement')){
+        document.getElementById('settlement').classList.toggle('error',!settlement);
+        err('err-settlement',!settlement);
+        ok=ok&&!!settlement;
+      }
+      const fmt=!!selectedFormat();
+      err('err-format',!fmt);
+      ok=ok&&fmt;
       if(!ok) return;
     }
+
     if(n===3){
       let ok=true;
-      const cat=!!v('category');document.getElementById('category')?.classList.toggle('error',!cat);err('err-category',!cat);ok=ok&&cat;
-      const desc=v('desc').length>=30;document.getElementById('desc')?.classList.toggle('error',!desc);err('err-desc',!desc);ok=ok&&desc;
+      const cat=!!v('category');
+      document.getElementById('category')?.classList.toggle('error',!cat);
+      err('err-category',!cat);
+      ok=ok&&cat;
+
+      const desc=v('desc').length>=30;
+      document.getElementById('desc')?.classList.toggle('error',!desc);
+      err('err-desc',!desc);
+      ok=ok&&desc;
+
       if(!ok) return;
     }
+
     setStep(n);
   };
 
-  document.addEventListener('click',()=>document.querySelectorAll('.dropdown').forEach(x=>x.classList.remove('open')));
+  document.addEventListener('click',()=>{
+    document.querySelectorAll('.dropdown').forEach(x=>x.classList.remove('open'));
+    document.body.classList.remove('dropdown-open');
+  });
+
   window.addEventListener('resize',()=>setTimeout(setSearchOverflowVisible,30));
 
   function init(){
