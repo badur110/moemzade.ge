@@ -98,8 +98,27 @@
       @media (max-width: 599px){
         #ddCat, #ddReg, #ddFmt { left: 12px; right: 12px; width: auto; max-height: 270px; }
       }
+      #dd-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.45);
+        z-index: 99990;
+        backdrop-filter: blur(1px);
+      }
+      #dd-backdrop.open { display: block; }
+      #ddCat, #ddReg, #ddFmt { z-index: 99999; }
     `;
     document.head.appendChild(style);
+    if(!document.getElementById('dd-backdrop')){
+      const bd=document.createElement('div');
+      bd.id='dd-backdrop';
+      document.body.appendChild(bd);
+      bd.addEventListener('click',()=>{
+        document.querySelectorAll('.dropdown').forEach(x=>x.classList.remove('open'));
+        bd.classList.remove('open');
+      });
+    }
   }
 
   function setSearchOverflowVisible(){
@@ -168,6 +187,8 @@
       markActive('ddFmt', el);
     }
     document.querySelectorAll('.dropdown').forEach(x=>x.classList.remove('open'));
+    const bd=document.getElementById('dd-backdrop');
+    if(bd) bd.classList.remove('open');
   };
 
   function markActive(id, el){
@@ -190,7 +211,13 @@
     if(!dd) return;
     const was=dd.classList.contains('open');
     document.querySelectorAll('.dropdown').forEach(x=>x.classList.remove('open'));
-    if(!was) dd.classList.add('open');
+    const bd=document.getElementById('dd-backdrop');
+    if(!was){
+      dd.classList.add('open');
+      if(bd) bd.classList.add('open');
+    } else {
+      if(bd) bd.classList.remove('open');
+    }
   };
 
   window.doSearch=function(){
@@ -235,7 +262,11 @@
     setStep(n);
   };
 
-  document.addEventListener('click',()=>document.querySelectorAll('.dropdown').forEach(x=>x.classList.remove('open')));
+  document.addEventListener('click',()=>{
+    document.querySelectorAll('.dropdown').forEach(x=>x.classList.remove('open'));
+    const bd=document.getElementById('dd-backdrop');
+    if(bd) bd.classList.remove('open');
+  });
   window.addEventListener('resize',()=>setTimeout(setSearchOverflowVisible,30));
 
   function init(){
