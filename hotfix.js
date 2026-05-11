@@ -72,7 +72,7 @@
         border: 1px solid #dfe4df;
         border-radius: 16px;
         box-shadow: 0 18px 45px rgba(15,45,38,.18);
-        z-index: 99999;
+        z-index: 999999;
         padding: 7px;
       }
       #ddCat.open, #ddReg.open, #ddFmt.open { display: block !important; }
@@ -96,7 +96,14 @@
         #ddReg { width: 300px; }
       }
       @media (max-width: 599px){
-        #ddCat, #ddReg, #ddFmt { left: 12px; right: 12px; width: auto; max-height: 270px; }
+        #ddCat, #ddReg, #ddFmt {
+          position: fixed !important;
+          left: 12px !important;
+          right: 12px !important;
+          width: auto !important;
+          max-height: 270px;
+          z-index: 999999;
+        }
       }
     `;
     document.head.appendChild(style);
@@ -190,7 +197,22 @@
     if(!dd) return;
     const was=dd.classList.contains('open');
     document.querySelectorAll('.dropdown').forEach(x=>x.classList.remove('open'));
-    if(!was) dd.classList.add('open');
+    if(!was){
+      // მობილურზე: ღილაკის პოზიცია გამოვთვალოთ და fixed-ად დავსვათ
+      if(window.innerWidth < 600){
+        const triggerBtn = e && (e.currentTarget || e.target);
+        if(triggerBtn){
+          const rect = triggerBtn.closest('.dropdown, [onclick]')?.getBoundingClientRect()
+                    || triggerBtn.getBoundingClientRect();
+          dd.style.top = (rect.bottom + 6) + 'px';
+        } else {
+          dd.style.top = '120px';
+        }
+      } else {
+        dd.style.top = '';
+      }
+      dd.classList.add('open');
+    }
   };
 
   window.doSearch=function(){
