@@ -1,0 +1,133 @@
+name: Apply Moemzade requested fixes
+
+on:
+  push:
+    branches:
+      - professional-cleanup
+
+permissions:
+  contents: write
+
+jobs:
+  apply-fixes:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: professional-cleanup
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Apply requested fixes
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          DEFAULT_PHOTO = 'https://i.ibb.co/3y6km7Z9/711213407-122101682967350935-3629065519639735453-n.jpg'
+          FB = 'https://www.facebook.com/MoemzadeE/'
+
+          # JS fixes: stable profile keys, default photos, no wrong numeric fallback.
+          p = Path('script.js')
+          s = p.read_text(encoding='utf-8')
+          if "const DEFAULT_PHOTO_URL" not in s:
+            s = s.replace("  const IMGBB_KEY = '9bae22f8073c39773f9ce6190ef54fe2';\n  const ROUTES", "  const IMGBB_KEY = '9bae22f8073c39773f9ce6190ef54fe2';\n  const DEFAULT_PHOTO_URL = '" + DEFAULT_PHOTO + "';\n  const PLATFORM_FACEBOOK_URL = '" + FB + "';\n  const ROUTES")
+          if "function buildTeacherKey" not in s:
+            s = s.replace("  const colorIndex = (name) => { let h = 0; for (const c of String(name || '')) h = (h * 31 + c.charCodeAt(0)) & 0xffffffff; return Math.abs(h) % BG_COLORS.length; };\n  const val", "  const colorIndex = (name) => { let h = 0; for (const c of String(name || '')) h = (h * 31 + c.charCodeAt(0)) & 0xffffffff; return Math.abs(h) % BG_COLORS.length; };\n  const hashString = (value) => { let h = 5381; for (const ch of String(value || '')) h = ((h << 5) + h + ch.charCodeAt(0)) >>> 0; return h.toString(36); };\n  function buildTeacherKey(t, index) {\n    const raw = [t.id, t.name, t.phone, t.category, t.region, t.settlement, index].map(v => String(v || '').trim().toLowerCase()).join('|');\n    return `t-${hashString(raw)}`;\n  }\n  function getTeacherPhoto(t) { return String(t?.photo || '').trim() || DEFAULT_PHOTO_URL; }\n  const fallbackPhotoAttr = () => `onerror=\"this.onerror=null;this.src='${attr(DEFAULT_PHOTO_URL)}';\"`;\n  const val")
+          if "data._key = buildTeacherKey" not in s:
+            s = s.replace("        data.id = String(data.id || index).trim();\n        data.settlement = String(data.settlement || '').trim();", "        data.id = String(data.id || index).trim();\n        data._key = buildTeacherKey(data, index);\n        data.settlement = String(data.settlement || '').trim();")
+          old = """    const image = t.photo
+      ? `<img src="${attr(t.photo)}" alt="${attr(t.name)}" loading="lazy">`
+      : `<div class="tc-avatar ${AV_COLORS[ci]}">${esc(getInitials(t.name))}</div>`;"""
+          new = """    const image = `<img src="${attr(getTeacherPhoto(t))}" alt="${attr(t.name)}" loading="lazy" ${fallbackPhotoAttr()}>`;"""
+          s = s.replace(old, new)
+          s = s.replace('data-teacher-id="${attr(t.id)}"', 'data-teacher-id="${attr(t._key)}"')
+          s = s.replace("""    let t = teachers.find(item => String(item.id) === String(id));
+    if (!t && /^\\d+$/.test(id || '')) t = teachers[Number(id)];
+    if (!t) { location.href = ROUTES.teachers; return; }""", """    let t = teachers.find(item => String(item._key) === String(id));
+    if (!t) t = teachers.find(item => String(item.id) === String(id));
+    if (!t) { location.href = ROUTES.teachers; return; }""")
+          old = """    if (wrap) wrap.className = `profile-photo ${BG_COLORS[ci]}`;
+    if (t.photo && img && initials) { img.src = t.photo; img.hidden = false; initials.hidden = true; img.alt = t.name; }
+    else if (initials) initials.textContent = getInitials(t.name);"""
+          new = """    if (wrap) wrap.className = `profile-photo ${BG_COLORS[ci]}`;
+    if (img) {
+      img.src = getTeacherPhoto(t);
+      img.hidden = false;
+      img.alt = t.name;
+      img.onerror = () => { img.onerror = null; img.src = DEFAULT_PHOTO_URL; };
+    }
+    if (initials) initials.hidden = true;"""
+          s = s.replace(old, new)
+          s = s.replace("format: checked('format'), online: checked('format'), photo: val('photoUrl'),", "format: checked('format'), online: checked('format'), photo: val('photoUrl') || DEFAULT_PHOTO_URL,")
+          p.write_text(s, encoding='utf-8')
+
+          # CSS fixes: hidden image bug, dropdown clipping, improved footer brand.
+          p = Path('style.css')
+          css = p.read_text(encoding='utf-8')
+          css = css.replace('img{max-width:100%;display:block}', 'img{max-width:100%;display:block}\n[hidden]{display:none!important}')
+          css = css.replace('.hero{position:relative;padding:74px 0 62px;overflow:hidden}', '.hero{position:relative;z-index:30;padding:74px 0 62px;overflow:visible}')
+          if '/* targeted polish fixes */' not in css:
+            css += """
+/* targeted polish fixes */
+.hero .dropdown{z-index:100000}.hero-glow{z-index:0}.hero-grid{z-index:2}main{position:relative;z-index:1}.photo-preview img[hidden],.profile-photo img[hidden]{display:none!important}.photo-upload .photo-preview{position:relative;overflow:hidden}.photo-upload .photo-preview img{position:absolute;inset:0}.profile-photo{background:#fff}.profile-photo img{background:#fff}.footer-brand{display:inline-flex!important;align-items:center;gap:9px;margin:0 0 14px!important;color:#fff!important}.footer-brand-mark{width:34px;height:34px;border-radius:12px;background:linear-gradient(135deg,var(--brand-2),#8EE2C7);display:inline-flex;align-items:center;justify-content:center;color:#08372C;font-size:18px;font-weight:900;box-shadow:0 10px 28px rgba(29,158,117,.24)}.footer-brand-name{font-size:17px;font-weight:900;letter-spacing:-.4px;color:#fff}.footer-brand-dot{font-size:17px;font-weight:800;color:#74D8B8}.footer-social{display:inline-flex!important;align-items:center;gap:8px;width:max-content;margin-top:4px!important;padding:10px 13px;border-radius:13px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08);color:#fff!important}.footer-social:hover{background:rgba(255,255,255,.13)}
+@media(max-width:760px){.hero{z-index:30;overflow:visible}.dropdown{max-height:60vh}.footer-brand-mark{width:32px;height:32px}}
+"""
+          p.write_text(css, encoding='utf-8')
+
+          footer = '''  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <a href="index.html" class="footer-brand" aria-label="Moemzade.ge მთავარი გვერდი">
+          <span class="footer-brand-mark">მ</span>
+          <span class="footer-brand-name">moemzade</span><span class="footer-brand-dot">.ge</span>
+        </a>
+        <p>საქართველოს მასწავლებლების, კურსებისა და ტრენერების უფასო საძიებო პლატფორმა.</p>
+      </div>
+      <div>
+        <h3>გვერდები</h3>
+        <a href="index.html">მთავარი</a>
+        <a href="teachers.html">მასწავლებლები</a>
+        <a href="register.html">პროფილის დამატება</a>
+      </div>
+      <div>
+        <h3>კონტაქტი</h3>
+        <a href="https://www.facebook.com/MoemzadeE/" target="_blank" rel="noopener" class="footer-social">📘 Facebook გვერდი</a>
+      </div>
+    </div>
+    <div class="container footer-bottom"><span>© 2026 Moemzade.ge</span><span>Made in Georgia</span></div>
+  </footer>'''
+          for name in ['index.html','teachers.html','teacher.html']:
+            p = Path(name)
+            html = p.read_text(encoding='utf-8')
+            html = re.sub(r'  <footer class="site-footer">[\s\S]*?</footer>', footer, html, count=1)
+            p.write_text(html, encoding='utf-8')
+          for name in ['register.html','404.html']:
+            p = Path(name)
+            html = p.read_text(encoding='utf-8')
+            if 'class="site-footer"' in html:
+              html = re.sub(r'  <footer class="site-footer">[\s\S]*?</footer>', footer, html, count=1)
+            elif name == 'register.html':
+              html = html.replace('  <script src="script.js"></script>', footer + '\n\n  <script src="script.js"></script>')
+            else:
+              html = html.replace('</body>', footer + '\n</body>')
+            p.write_text(html, encoding='utf-8')
+
+          Path('.github/workflows/apply-moemzade-fixes.yml').unlink(missing_ok=True)
+          PY
+
+      - name: Validate JavaScript
+        run: node --check script.js
+
+      - name: Commit fixes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "Apply requested UI and profile fixes [skip ci]"
+          git push origin HEAD:professional-cleanup
