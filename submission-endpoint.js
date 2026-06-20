@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  var APPS_URL = 'https://script.google.com/macros/s/AKfycbxadtLaS2G5o70zTdIKjk6e9HxcTJ6qZDcDcgI0QD8gnKhH8pjK7K0hxriH7CIKH2KvUQ/exec';
+  var APPS_URL = 'https://script.google.com/macros/s/AKfycbyRsQEsBM9ztnCQl9C_dyr51ugmF7MV9GY1hdL0HOQBDgc2PYAd-JvOXwpPQfkxXXzK/exec';
 
   function q(id) { return document.getElementById(id); }
   function val(id) { var el = q(id); return el ? String(el.value || '').trim() : ''; }
@@ -120,8 +120,6 @@
   }
 
   function submitToAppsScript(data) {
-    // Multiple transport methods are used because Apps Script + static hosting can be
-    // inconsistent across browsers. The Apps Script code de-duplicates by submissionId.
     postByHiddenForm(data);
     postByFetch(data);
     postByBeacon(data);
