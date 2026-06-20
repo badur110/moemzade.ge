@@ -6,22 +6,41 @@
   <base href="../">
   <title>გახდი მასწავლებელი — Moemzade</title>
 </head>
-<body class="reg-page">
+<body class="register-page" data-page="register">
   <script>
-    fetch('register.html')
-      .then(r => r.text())
-      .then(html => {
-        const doc = new DOMParser().parseFromString(html, 'text/html');
-        document.head.innerHTML = '<base href="../">' + doc.head.innerHTML;
-        document.body.innerHTML = doc.body.innerHTML;
-        document.body.className = 'reg-page';
-        const s1 = document.createElement('script');
-        s1.src = 'script.js';
-        document.body.appendChild(s1);
-        const s2 = document.createElement('script');
-        s2.src = 'clean-routes.js';
-        document.body.appendChild(s2);
-      });
+    (function () {
+      function loadScript(src) {
+        return new Promise(function (resolve) {
+          var s = document.createElement('script');
+          s.src = src;
+          s.onload = resolve;
+          s.onerror = resolve;
+          document.body.appendChild(s);
+        });
+      }
+
+      fetch('register.html', { cache: 'no-store' })
+        .then(function (r) { return r.text(); })
+        .then(function (html) {
+          var doc = new DOMParser().parseFromString(html, 'text/html');
+          document.head.innerHTML = '<base href="../">' + doc.head.innerHTML;
+          document.body.innerHTML = doc.body.innerHTML;
+          document.body.className = 'register-page';
+          document.body.dataset.page = 'register';
+
+          return loadScript('script.js?v=20260620-register-fix')
+            .then(function () {
+              // script.js was loaded after DOMContentLoaded on clean URL pages,
+              // so manually trigger its initializer once for this injected page.
+              document.dispatchEvent(new Event('DOMContentLoaded'));
+              return loadScript('site-fixes.js?v=20260620-register-fix');
+            })
+            .then(function () { return loadScript('clean-routes.js?v=20260620-register-fix'); });
+        })
+        .catch(function () {
+          location.href = '../register.html';
+        });
+    })();
   </script>
 </body>
 </html>
