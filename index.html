@@ -13,6 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="site-fixes.css">
+  <script>if(location.pathname.endsWith('/index.html'))history.replaceState(null,'','/'+location.search+location.hash);</script>
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://moemzade.ge/">
   <meta property="og:title" content="Moemzade.ge — იპოვე შენი მასწავლებელი">
@@ -22,22 +23,18 @@
 <body data-page="index">
   <nav class="nav" aria-label="მთავარი ნავიგაცია">
     <div class="nav-inner">
-      <a href="index.html" class="brand" aria-label="Moemzade.ge მთავარი გვერდი">
-        <img src="logo.svg" alt="Moemzade.ge" class="brand-img">
-      </a>
+      <a href="/" class="brand" aria-label="Moemzade.ge მთავარი გვერდი"><img src="logo.svg" alt="Moemzade.ge" class="brand-img"></a>
       <div class="nav-links">
-        <a href="teachers.html">მასწავლებლები</a>
+        <a href="/teachers/">მასწავლებლები</a>
         <a href="#categories">კატეგორიები</a>
-        <a href="register.html" class="btn btn-primary btn-small">+ პროფილის დამატება</a>
+        <a href="/register/" class="btn btn-primary btn-small">+ პროფილის დამატება</a>
       </div>
-      <button class="hamburger" type="button" onclick="toggleMenu()" aria-label="მენიუს გახსნა">
-        <span></span><span></span><span></span>
-      </button>
+      <button class="hamburger" type="button" onclick="toggleMenu()" aria-label="მენიუს გახსნა"><span></span><span></span><span></span></button>
     </div>
     <div class="mobile-menu" id="mobileMenu">
-      <a href="teachers.html">მასწავლებლები</a>
+      <a href="/teachers/">მასწავლებლები</a>
       <a href="#categories">კატეგორიები</a>
-      <a href="register.html">+ პროფილის დამატება</a>
+      <a href="/register/">+ პროფილის დამატება</a>
     </div>
   </nav>
 
@@ -49,46 +46,17 @@
         <div class="eyebrow"><span></span> უფასო პლატფორმა საქართველოში</div>
         <h1>იპოვე შენი <em>მასწავლებელი</em> მარტივად</h1>
         <p>სასკოლო საგნები, ენები, მუსიკა, ცეკვა, ტექნოლოგია, სილამაზე, სპორტი და კიდევ ბევრი სფერო — ერთ სივრცეში.</p>
-
         <div class="search-panel" id="searchPanel">
-          <div class="search-select" id="sbCat" onclick="toggleDropdown('ddCat', event)">
-            <span class="search-label">სფერო</span>
-            <strong id="selCat">ყველა კატეგორია</strong>
-            <div class="dropdown" id="ddCat"></div>
-          </div>
-          <div class="search-select" id="sbReg" onclick="toggleDropdown('ddReg', event)">
-            <span class="search-label">რეგიონი</span>
-            <strong id="selReg">ყველა რეგიონი</strong>
-            <div class="dropdown" id="ddReg"></div>
-          </div>
-          <div class="search-select" id="sbFmt" onclick="toggleDropdown('ddFmt', event)">
-            <span class="search-label">ფორმატი</span>
-            <strong id="selFmt">ნებისმიერი</strong>
-            <div class="dropdown" id="ddFmt"></div>
-          </div>
+          <div class="search-select" id="sbCat" onclick="toggleDropdown('ddCat', event)"><span class="search-label">სფერო</span><strong id="selCat">ყველა კატეგორია</strong><div class="dropdown" id="ddCat"></div></div>
+          <div class="search-select" id="sbReg" onclick="toggleDropdown('ddReg', event)"><span class="search-label">რეგიონი</span><strong id="selReg">ყველა რეგიონი</strong><div class="dropdown" id="ddReg"></div></div>
+          <div class="search-select" id="sbFmt" onclick="toggleDropdown('ddFmt', event)"><span class="search-label">ფორმატი</span><strong id="selFmt">ნებისმიერი</strong><div class="dropdown" id="ddFmt"></div></div>
           <button class="search-btn" type="button" onclick="doSearch()">ძებნა</button>
         </div>
-
-        <div class="hero-stats" aria-label="საიტის სტატისტიკა">
-          <div><strong id="statCount">0</strong><span>მასწავლებელი</span></div>
-          <div><strong id="statCats">14</strong><span>სფერო</span></div>
-          <div><strong id="statRegions">12</strong><span>რეგიონი</span></div>
-        </div>
+        <div class="hero-stats" aria-label="საიტის სტატისტიკა"><div><strong id="statCount">0</strong><span>მასწავლებელი</span></div><div><strong id="statCats">14</strong><span>სფერო</span></div><div><strong id="statRegions">12</strong><span>რეგიონი</span></div></div>
       </div>
-
       <div class="hero-card" aria-label="Moemzade უპირატესობები">
-        <div class="hero-card-top">
-          <span class="hero-card-icon">✓</span>
-          <div>
-            <strong>სწრაფი კონტაქტი</strong>
-            <p>ნახე ფასი, ქალაქი, ფორმატი და დაუკავშირდი პირდაპირ.</p>
-          </div>
-        </div>
-        <div class="mini-list">
-          <div><span>01</span> აირჩიე სფერო</div>
-          <div><span>02</span> შეადარე პროფილები</div>
-          <div><span>03</span> დაუკავშირდი მასწავლებელს</div>
-        </div>
+        <div class="hero-card-top"><span class="hero-card-icon">✓</span><div><strong>სწრაფი კონტაქტი</strong><p>ნახე ფასი, ქალაქი, ფორმატი და დაუკავშირდი პირდაპირ.</p></div></div>
+        <div class="mini-list"><div><span>01</span> აირჩიე სფერო</div><div><span>02</span> შეადარე პროფილები</div><div><span>03</span> დაუკავშირდი მასწავლებელს</div></div>
       </div>
     </div>
   </header>
@@ -96,63 +64,29 @@
   <main>
     <section class="section section-soft" id="categories">
       <div class="container">
-        <div class="section-head">
-          <div>
-            <span class="section-kicker">პოპულარული მიმართულებები</span>
-            <h2>აირჩიე კატეგორია</h2>
-          </div>
-          <a href="teachers.html" class="text-link">ყველას ნახვა →</a>
-        </div>
+        <div class="section-head"><div><span class="section-kicker">პოპულარული მიმართულებები</span><h2>აირჩიე კატეგორია</h2></div><a href="/teachers/" class="text-link">ყველას ნახვა →</a></div>
         <div class="cats-grid" id="categoriesGrid"></div>
       </div>
     </section>
-
     <section class="section">
       <div class="container">
-        <div class="section-head">
-          <div>
-            <span class="section-kicker">ახალი პროფილები</span>
-            <h2>ბოლო დამატებული მასწავლებლები</h2>
-          </div>
-          <a href="teachers.html" class="text-link">ყველას ნახვა →</a>
-        </div>
-        <div class="teachers-grid featured-grid" id="featuredTeachers">
-          <div class="empty-state">მასწავლებლები იტვირთება...</div>
-        </div>
+        <div class="section-head"><div><span class="section-kicker">ახალი პროფილები</span><h2>ბოლო დამატებული მასწავლებლები</h2></div><a href="/teachers/" class="text-link">ყველას ნახვა →</a></div>
+        <div class="teachers-grid featured-grid" id="featuredTeachers"><div class="empty-state">მასწავლებლები იტვირთება...</div></div>
       </div>
     </section>
-
     <section class="section section-dark">
       <div class="container cta-grid">
-        <div>
-          <span class="section-kicker light">მასწავლებლებისთვის</span>
-          <h2>ასწავლი რამეს? დაამატე შენი პროფილი უფასოდ</h2>
-          <p>შეავსე მოკლე ფორმა და შენი პროფილი გამოჩნდება საიტზე დადასტურების შემდეგ.</p>
-        </div>
-        <a href="register.html" class="btn btn-white">პროფილის დამატება</a>
+        <div><span class="section-kicker light">მასწავლებლებისთვის</span><h2>ასწავლი რამეს? დაამატე შენი პროფილი უფასოდ</h2><p>შეავსე მოკლე ფორმა და შენი პროფილი გამოჩნდება საიტზე დადასტურების შემდეგ.</p></div>
+        <a href="/register/" class="btn btn-white">პროფილის დამატება</a>
       </div>
     </section>
   </main>
 
   <footer class="site-footer">
     <div class="container footer-grid">
-      <div>
-        <a href="index.html" class="footer-brand" aria-label="Moemzade.ge მთავარი გვერდი">
-          <span class="footer-brand-mark">მ</span>
-          <span class="footer-brand-name">moemzade</span><span class="footer-brand-dot">.ge</span>
-        </a>
-        <p>საქართველოს მასწავლებლების, კურსებისა და ტრენერების უფასო საძიებო პლატფორმა.</p>
-      </div>
-      <div>
-        <h3>გვერდები</h3>
-        <a href="index.html">მთავარი</a>
-        <a href="teachers.html">მასწავლებლები</a>
-        <a href="register.html">პროფილის დამატება</a>
-      </div>
-      <div>
-        <h3>კონტაქტი</h3>
-        <a href="https://www.facebook.com/MoemzadeE/" target="_blank" rel="noopener" class="footer-social">📘 Facebook გვერდი</a>
-      </div>
+      <div><img src="logo.svg" alt="Moemzade.ge" class="footer-logo"><p>საქართველოს მასწავლებლების, კურსებისა და ტრენერების უფასო საძიებო პლატფორმა.</p></div>
+      <div><h3>გვერდები</h3><a href="/">მთავარი</a><a href="/teachers/">მასწავლებლები</a><a href="/register/">პროფილის დამატება</a></div>
+      <div><h3>კონტაქტი</h3><a href="https://www.facebook.com/MoemzadeE/" target="_blank" rel="noopener" class="footer-social">📘 Facebook გვერდი</a></div>
     </div>
     <div class="container footer-bottom"><span>© 2026 Moemzade.ge</span><span>Made in Georgia</span></div>
   </footer>
