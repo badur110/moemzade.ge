@@ -60,8 +60,6 @@
   }
 
   function postByHiddenForm(data) {
-    // Apps Script web apps are more reliable with a normal form POST than with CORS/fetch.
-    // The server reads e.parameter.payload and appends the row.
     var frameName = 'mz_submit_frame_' + Date.now();
     var iframe = document.createElement('iframe');
     iframe.name = frameName;
@@ -87,7 +85,47 @@
     setTimeout(function () {
       if (form.parentNode) form.parentNode.removeChild(form);
       if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
-    }, 15000);
+    }, 20000);
+  }
+
+  function postByFetch(data) {
+    try {
+      fetch(APPS_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        keepalive: true,
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(data)
+      }).catch(function () {});
+    } catch (e) {}
+  }
+
+  function postByBeacon(data) {
+    try {
+      if (!navigator.sendBeacon) return;
+      var blob = new Blob([JSON.stringify(data)], { type: 'text/plain;charset=utf-8' });
+      navigator.sendBeacon(APPS_URL, blob);
+    } catch (e) {}
+  }
+
+  function postByImageGet(data) {
+    try {
+      var img = new Image();
+      img.style.display = 'none';
+      img.alt = '';
+      img.src = APPS_URL + '?payload=' + encodeURIComponent(JSON.stringify(data)) + '&t=' + Date.now();
+      document.body.appendChild(img);
+      setTimeout(function () { if (img.parentNode) img.parentNode.removeChild(img); }, 20000);
+    } catch (e) {}
+  }
+
+  function submitToAppsScript(data) {
+    // Multiple transport methods are used because Apps Script + static hosting can be
+    // inconsistent across browsers. The Apps Script code de-duplicates by submissionId.
+    postByHiddenForm(data);
+    postByFetch(data);
+    postByBeacon(data);
+    postByImageGet(data);
   }
 
   window.submitForm = function submitFormToLiveEndpoint() {
@@ -129,15 +167,15 @@
     if (btn) { btn.disabled = true; btn.textContent = 'იგზავნება...'; }
 
     try {
-      postByHiddenForm(data);
-      setTimeout(showSuccess, 1200);
+      submitToAppsScript(data);
+      setTimeout(showSuccess, 1400);
     } catch (err) {
       console.error(err);
       alert('გაგზავნა ვერ მოხერხდა. სცადე თავიდან.');
     } finally {
       setTimeout(function () {
         if (btn) { btn.disabled = false; btn.textContent = 'პროფილის გაგზავნა ✓'; }
-      }, 1500);
+      }, 1800);
     }
   };
 })();
