@@ -1,4 +1,5 @@
 // Robust teacher card routing for Moemzade.ge
+// Kept as a small fallback. Main routing is handled by site-fixes.js.
 (function(){
   'use strict';
   var SHEET = '1weL4w0BzXGrYPIczj0kKYFdvE615OIMKSzIpt9Q1Yu0';
@@ -17,8 +18,7 @@
         var json = JSON.parse(text.substring(47).slice(0,-2));
         return (json.table.rows || []).map(function(row, idx){
           var c = row.c || [];
-          var isNew = c.length >= 16;
-          var t = isNew ? {
+          var t = {
             id: (c[0] && c[0].v) || '',
             name: (c[1] && c[1].v) || '',
             category: (c[2] && c[2].v) || '',
@@ -26,14 +26,6 @@
             price: (c[6] && c[6].v) || '',
             priceType: (c[7] && c[7].v) || 'საათში',
             approved: (c[15] && c[15].v) || ''
-          } : {
-            id: (c[0] && c[0].v) || '',
-            name: (c[1] && c[1].v) || '',
-            category: (c[2] && c[2].v) || '',
-            subcat: (c[3] && c[3].v) || '',
-            price: (c[5] && c[5].v) || '',
-            priceType: 'საათში',
-            approved: (c[13] && c[13].v) || ''
           };
           t.sheetRow = idx + 2;
           t.id = String(t.id || ('row-'+t.sheetRow)).trim();
@@ -49,6 +41,7 @@
   function cardInfo(card){
     return {
       id: String(card.getAttribute('data-teacher-id') || '').trim(),
+      row: String(card.getAttribute('data-sheet-row') || '').trim(),
       name: norm((card.querySelector('.tc-name') || {}).textContent || ''),
       sub: norm((card.querySelector('.tc-sub') || {}).textContent || ''),
       price: compact((card.querySelector('.tc-price') || {}).textContent || '')
@@ -57,6 +50,10 @@
 
   function resolve(card, list){
     var c = cardInfo(card);
+    if(c.row){
+      var byRow = list.find(function(t){ return String(t.sheetRow) === c.row; });
+      if(byRow) return byRow;
+    }
     var byName = list.filter(function(t){ return t.nameKey === c.name; });
     if(byName.length === 1) return byName[0];
     var bySub = byName.filter(function(t){ return !c.sub || t.subKey === c.sub; });
@@ -68,22 +65,23 @@
 
   function url(t){
     var id = t && t.id ? t.id : 'row-'+(t && t.sheetRow ? t.sheetRow : '');
-    return 'teacher.html?id=' + encodeURIComponent(id) + (t && t.sheetRow ? '&row=' + encodeURIComponent(t.sheetRow) : '');
+    return '/teacher/?id=' + encodeURIComponent(id) + (t && t.sheetRow ? '&row=' + encodeURIComponent(t.sheetRow) : '');
   }
 
   document.addEventListener('click', function(e){
     var card = e.target.closest && e.target.closest('.teacher-card');
-    if(!card) return;
+    if(!card || card.__mzHandled) return;
     e.preventDefault();
     e.stopPropagation();
     e.stopImmediatePropagation();
+    card.__mzHandled = true;
     readSheet().then(function(list){
       var t = resolve(card, list);
       if(t) location.href = url(t);
       else {
         var fallback = card.getAttribute('data-teacher-id');
-        if(fallback) location.href = 'teacher.html?id=' + encodeURIComponent(fallback);
+        if(fallback) location.href = '/teacher/?id=' + encodeURIComponent(fallback);
       }
-    });
+    }).catch(function(){ card.__mzHandled = false; });
   }, true);
 })();
