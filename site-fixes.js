@@ -29,6 +29,14 @@
     img.src = cleanPhoto(src);
   }
 
+  function hideProfileSocials(){
+    var instRow = q('instRow');
+    var fbRow = q('fbRow');
+    if(instRow) instRow.remove();
+    if(fbRow) fbRow.remove();
+    document.querySelectorAll('.contact-btn-sec, .contact-btns-row').forEach(function(el){ el.remove(); });
+  }
+
   function fixImages(){
     document.querySelectorAll('.teacher-card .tc-img').forEach(function(box){
       var img = box.querySelector('img');
@@ -68,9 +76,7 @@
     set('profPrice', price(x.price, x.pt));
     set('profPhone', x.phone);
     set('profDesc', x.desc);
-
-    if(x.inst){ var ir = q('instRow'); if(ir) ir.removeAttribute('hidden'); set('profInsta','@' + String(x.inst).replace('@','')); }
-    if(x.fb){ var fr = q('fbRow'); if(fr) fr.removeAttribute('hidden'); set('profFb', x.fb); }
+    hideProfileSocials();
 
     var box = q('contactBtns');
     if(box){
@@ -80,15 +86,13 @@
         h += '<a href="tel:'+esc(ph)+'" class="contact-btn-main">📞 დარეკვა — '+esc(x.phone)+'</a>';
         h += '<a href="https://wa.me/995'+esc(geo)+'" target="_blank" rel="noopener" class="contact-btn-main whatsapp">💬 WhatsApp-ზე მიწერა</a>';
       }
-      var soc = '';
-      if(x.inst) soc += '<a href="https://instagram.com/'+esc(String(x.inst).replace('@',''))+'" target="_blank" rel="noopener" class="contact-btn-sec">📸 Instagram</a>';
-      if(x.fb){ var f = String(x.fb).indexOf('http') === 0 ? x.fb : 'https://facebook.com/' + x.fb; soc += '<a href="'+esc(f)+'" target="_blank" rel="noopener" class="contact-btn-sec">📘 Facebook</a>'; }
-      box.innerHTML = h + (soc ? '<div class="contact-btns-row">'+soc+'</div>' : '');
+      box.innerHTML = h || '<div class="empty-state">საკონტაქტო ინფორმაცია არ არის მითითებული.</div>';
     }
   }
 
   function profileFix(){
     if(document.body.getAttribute('data-page') !== 'profile') return;
+    hideProfileSocials();
     var requestedId = new URLSearchParams(location.search).get('id') || '';
     if(!requestedId) return;
 
@@ -113,7 +117,7 @@
         if(!found && /^\d+$/.test(requestedId)) found = list.find(function(x){ return String(x.row) === String(requestedId); });
         if(found) renderProfile(found);
       })
-      .catch(function(){ fixImages(); });
+      .catch(function(){ fixImages(); hideProfileSocials(); });
   }
 
   function init(){
@@ -121,7 +125,7 @@
     fixImages();
     profileFix();
     setTimeout(fixImages, 700);
-    setTimeout(fixImages, 1600);
+    setTimeout(function(){ fixImages(); hideProfileSocials(); }, 1600);
   }
 
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
