@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  var APPS_URL = 'https://script.google.com/macros/s/AKfycbwVV-aapV1FHplhUN619LxUKtiBAzu3PAVMgv4OuYasSrOotFFi6NAvmCGTmZ5OZRmMpg/exec';
+  var APPS_URL = 'https://script.google.com/macros/s/AKfycbxadtLaS2G5o70zTdIKjk6e9HxcTJ6qZDcDcgI0QD8gnKhH8pjK7K0hxriH7CIKH2KvUQ/exec';
 
   function q(id) { return document.getElementById(id); }
   function val(id) { var el = q(id); return el ? String(el.value || '').trim() : ''; }
