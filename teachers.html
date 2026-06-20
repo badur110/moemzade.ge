@@ -1,84 +1,16 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ka">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>მასწავლებლები — Moemzade.ge</title>
-  <meta name="description" content="მოძებნე მასწავლებლები კატეგორიის, რეგიონის, ქალაქისა და გაკვეთილის ფორმატის მიხედვით.">
-  <meta name="theme-color" content="#0F6E56">
-  <link rel="canonical" href="https://moemzade.ge/teachers.html">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="site-fixes.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>გადამისამართება — Moemzade.ge</title>
+  <link rel="canonical" href="https://moemzade.ge/teachers/">
+  <meta name="robots" content="noindex">
+  <script>
+    location.replace('/teachers/' + location.search + location.hash);
+  </script>
 </head>
-<body data-page="teachers">
-  <nav class="nav" aria-label="მთავარი ნავიგაცია">
-    <div class="nav-inner">
-      <a href="index.html" class="brand"><img src="logo.svg" alt="Moemzade.ge" class="brand-img"></a>
-      <div class="nav-links">
-        <a href="teachers.html" class="active">მასწავლებლები</a>
-        <a href="index.html#categories">კატეგორიები</a>
-        <a href="register.html" class="btn btn-primary btn-small">+ პროფილის დამატება</a>
-      </div>
-      <button class="hamburger" type="button" onclick="toggleMenu()" aria-label="მენიუს გახსნა"><span></span><span></span><span></span></button>
-    </div>
-    <div class="mobile-menu" id="mobileMenu">
-      <a href="teachers.html">მასწავლებლები</a>
-      <a href="index.html#categories">კატეგორიები</a>
-      <a href="register.html">+ პროფილის დამატება</a>
-    </div>
-  </nav>
-
-  <header class="listing-hero">
-    <div class="container listing-head">
-      <div>
-        <span class="section-kicker">საძიებო კატალოგი</span>
-        <h1>მასწავლებლები</h1>
-      </div>
-      <div class="results-count" id="resultsCount">იტვირთება...</div>
-    </div>
-  </header>
-
-  <main class="section listing-section">
-    <div class="container">
-      <div class="toolbar">
-        <label class="search-input">
-          <span>ძებნა</span>
-          <input type="search" id="teacherSearch" placeholder="სახელი, საგანი, ქალაქი...">
-        </label>
-        <div class="filter-pills">
-          <button class="filter-pill" id="pillCat" type="button" onclick="openFilter('cat')"><span id="pillCatLabel">ყველა სფერო</span><i>▾</i></button>
-          <button class="filter-pill" id="pillReg" type="button" onclick="openFilter('reg')"><span id="pillRegLabel">ყველა რეგიონი</span><i>▾</i></button>
-          <button class="filter-pill" id="pillSettlement" type="button" onclick="openFilter('settlement')"><span id="pillSettlementLabel">ქალაქი/სოფელი</span><i>▾</i></button>
-          <button class="filter-pill" id="pillFmt" type="button" onclick="openFilter('fmt')"><span id="pillFmtLabel">ნებისმიერი</span><i>▾</i></button>
-        </div>
-      </div>
-      <div class="teachers-grid" id="teachersList"><div class="empty-state">მასწავლებლები იტვირთება...</div></div>
-      <div class="pagination" id="pagination"></div>
-    </div>
-  </main>
-
-  <div class="filter-overlay" id="filterOverlay" aria-hidden="true">
-    <div class="filter-panel" role="dialog" aria-modal="true" aria-labelledby="fpTitle">
-      <span class="fp-handle"></span><h2 id="fpTitle">ფილტრი</h2><div id="fpContent"></div>
-      <div class="fp-footer"><button type="button" class="btn btn-muted" onclick="clearFilter()">გასუფთავება</button><button type="button" class="btn btn-primary" onclick="applyFilter()">შედეგების ჩვენება</button></div>
-    </div>
-  </div>
-
-  <footer class="site-footer">
-    <div class="container footer-grid">
-      <div><a href="index.html" class="footer-brand" aria-label="Moemzade.ge მთავარი გვერდი"><span class="footer-brand-mark">მ</span><span class="footer-brand-name">moemzade</span><span class="footer-brand-dot">.ge</span></a><p>საქართველოს მასწავლებლების, კურსებისა და ტრენერების უფასო საძიებო პლატფორმა.</p></div>
-      <div><h3>გვერდები</h3><a href="index.html">მთავარი</a><a href="teachers.html">მასწავლებლები</a><a href="register.html">პროფილის დამატება</a></div>
-      <div><h3>კონტაქტი</h3><a href="https://www.facebook.com/MoemzadeE/" target="_blank" rel="noopener" class="footer-social">Facebook გვერდი</a></div>
-    </div>
-    <div class="container footer-bottom"><span>© 2026 Moemzade.ge</span><span>Made in Georgia</span></div>
-  </footer>
-
-  <script src="script.js"></script>
-  <script src="site-fixes.js"></script>
-  <script src="routing-fix.js"></script>
+<body>
+  <p>გადადიხარ <a href="/teachers/">მასწავლებლების გვერდზე</a>...</p>
 </body>
 </html>
