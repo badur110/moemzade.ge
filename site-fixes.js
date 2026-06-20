@@ -1,4 +1,4 @@
-// Moemzade.ge runtime upgrades — stable routing, sorting, profile rendering, similar teachers
+// Moemzade.ge runtime polish — stable routing, filters, profile rendering, similar teachers
 (function () {
   'use strict';
 
@@ -8,18 +8,7 @@
   var PAGE_SIZE = 28;
   var sheetPromise = null;
 
-  var state = {
-    teachers: [],
-    page: 1,
-    cat: '',
-    reg: '',
-    settlement: '',
-    fmt: '',
-    q: '',
-    sort: 'newest',
-    active: '',
-    temp: ''
-  };
+  var state = { teachers: [], page: 1, cat: '', reg: '', settlement: '', fmt: '', q: '', active: '', temp: '' };
 
   var CATEGORY_DATA = {
     'მუსიკა':['გიტარა','ფორტეპიანო / კლავიში','ვოკალი','სკრიპკა','დრამი','ბასი','უკულელე','DJ','მუსიკის თეორია','ხალხური ინსტრუმენტები','სხვა'],
@@ -56,23 +45,13 @@
   };
   var FORMATS = ['', 'პირადად','ონლაინ','ორივე'];
   var FORMAT_LABELS = ['ნებისმიერი','პირადად','ონლაინ','ორივე'];
-  var SEO_LINKS = [
-    ['/teachers/tbilisi/inglisuri/','ინგლისურის მასწავლებლები თბილისში'],
-    ['/teachers/tbilisi/matematika/','მათემატიკის მასწავლებლები თბილისში'],
-    ['/teachers/?reg=თბილისი&cat=ტექნოლოგია','ტექნოლოგიის მასწავლებლები თბილისში'],
-    ['/teachers/?reg=თბილისი&cat=მართვა','მართვის მასწავლებლები თბილისში'],
-    ['/teachers/?reg=აჭარა','მასწავლებლები აჭარაში']
-  ];
 
   function q(id) { return document.getElementById(id); }
-  function val(id) { var el = q(id); return el && el.value ? String(el.value).trim() : ''; }
-  function checked(name) { var el = document.querySelector('input[name="' + name + '"]:checked'); return el ? el.value : ''; }
   function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (ch) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]; }); }
   function attr(v) { return esc(v); }
   function norm(v) { return String(v == null ? '' : v).toLowerCase().replace(/\s+/g, ' ').trim(); }
   function approved(v) { return ['კი','yes','true','1'].indexOf(norm(v)) !== -1; }
   function numericId(v) { var m = String(v || '').match(/(\d+)/); return m ? Number(m[1]) : 0; }
-  function priceNum(t) { var n = Number(String(t.price || '').replace(',', '.').replace(/[^0-9.]/g, '')); return isNaN(n) || !n ? null : n; }
   function isOnline(format) { return ['კი','ონლაინ','ორივე'].indexOf(norm(format)) !== -1; }
   function isOffline(format) { var f = norm(format); return ['პირადად','ორივე',''].indexOf(f) !== -1 || ['კი','ონლაინ'].indexOf(f) === -1; }
   function formatLabel(format) { var on = isOnline(format), off = isOffline(format); if (on && off) return 'ორივე'; if (on) return 'ონლაინ'; return 'პირადად'; }
@@ -100,8 +79,6 @@
             price: c[6] && c[6].v || '',
             priceType: c[7] && c[7].v || 'საათში',
             phone: c[8] && c[8].v || '',
-            instagram: c[9] && c[9].v || '',
-            facebook: c[10] && c[10].v || '',
             desc: c[11] && c[11].v || '',
             online: c[12] && c[12].v || '',
             photo: c[13] && c[13].v || '',
@@ -112,8 +89,6 @@
           t.sheetRow = idx + 2;
           t.rowIndex = idx;
           t.numId = numericId(t.id);
-          t.nameKey = norm(t.name);
-          t.subKey = norm(t.subcat || t.category);
           return t;
         }).filter(function (t) { return t.name && approved(t.approved); });
       })
@@ -121,14 +96,19 @@
     return sheetPromise;
   }
 
-  function teacherUrl(t) {
-    return '/teacher/?id=' + encodeURIComponent(t.id || '') + (t.sheetRow ? '&row=' + encodeURIComponent(t.sheetRow) : '');
-  }
+  function teacherUrl(t) { return '/teacher/?id=' + encodeURIComponent(t.id || '') + (t.sheetRow ? '&row=' + encodeURIComponent(t.sheetRow) : ''); }
 
   function renderCard(t) {
-    return '<article class="teacher-card scroll-reveal" data-teacher-id="' + attr(t.id) + '" data-sheet-row="' + attr(t.sheetRow || '') + '" tabindex="0" role="button" aria-label="' + attr(t.name) + ' პროფილის ნახვა">' +
+    return '<article class="teacher-card" data-teacher-id="' + attr(t.id) + '" data-sheet-row="' + attr(t.sheetRow || '') + '" tabindex="0" role="button" aria-label="' + attr(t.name) + ' პროფილის ნახვა">' +
       '<div class="tc-img"><img src="' + attr(cleanPhoto(t.photo)) + '" alt="' + attr(t.name) + '" loading="lazy" onerror="this.onerror=null;this.src=\'' + DEF + '\'"></div>' +
       '<div class="tc-body"><h3 class="tc-name">' + esc(t.name) + '</h3><p class="tc-sub">' + esc(t.subcat || t.category || 'მასწავლებელი') + '</p><div class="tc-meta-row"><span class="tc-place">📍 ' + esc(getPlace(t)) + '</span><span class="tc-format">' + esc(formatLabel(t.online)) + '</span></div><div class="tc-footer"><span class="tc-price">' + esc(formatPrice(t.price, t.priceType)) + '</span><span class="tc-open">ნახვა</span></div></div></article>';
+  }
+
+  function renderMiniCard(t) {
+    return '<a class="similar-mini-card" href="' + attr(teacherUrl(t)) + '" aria-label="' + attr(t.name) + ' პროფილის ნახვა">' +
+      '<span class="similar-mini-img"><img src="' + attr(cleanPhoto(t.photo)) + '" alt="' + attr(t.name) + '" loading="lazy" onerror="this.onerror=null;this.src=\'' + DEF + '\'"></span>' +
+      '<span class="similar-mini-body"><strong>' + esc(t.name) + '</strong><small>' + esc(t.subcat || t.category || 'მასწავლებელი') + '</small><em>📍 ' + esc(getPlace(t)) + '</em><b>' + esc(formatPrice(t.price, t.priceType)) + '</b></span>' +
+      '</a>';
   }
 
   function setFooter() {
@@ -136,6 +116,24 @@
     var old = document.querySelector('.site-footer');
     if (old) old.outerHTML = html;
     else document.body.insertAdjacentHTML('beforeend', html);
+  }
+
+  function removePopularSeoLinks() {
+    document.querySelectorAll('#popularSeoLinks,.seo-links-section').forEach(function (el) { el.remove(); });
+  }
+
+  function removeSortControls() {
+    document.querySelectorAll('#sortTeachers,.sort-control').forEach(function (el) {
+      var wrap = el.closest && el.closest('.sort-control');
+      (wrap || el).remove();
+    });
+    try {
+      var url = new URL(window.location.href);
+      if (url.searchParams.has('sort')) {
+        url.searchParams.delete('sort');
+        window.history.replaceState({}, '', url.pathname + (url.search ? url.search : '') + url.hash);
+      }
+    } catch (e) {}
   }
 
   function showImage(img, src, alt) {
@@ -187,15 +185,6 @@
     }, true);
   }
 
-  function addSortControl() {
-    var toolbar = document.querySelector('.toolbar');
-    if (!toolbar || q('sortTeachers')) return;
-    var div = document.createElement('label');
-    div.className = 'sort-control';
-    div.innerHTML = '<span>დალაგება</span><select id="sortTeachers"><option value="newest">ახალი დამატებული</option><option value="priceAsc">ფასი: იაფიდან ძვირისკენ</option><option value="priceDesc">ფასი: ძვირიდან იაფისკენ</option><option value="nameAsc">სახელი: ა → ჰ</option><option value="nameDesc">სახელი: ჰ → ა</option></select>';
-    toolbar.appendChild(div);
-  }
-
   function settlementOptions() {
     var base = state.reg ? (REGION_SETTLEMENTS[state.reg] || []) : Object.keys(REGION_SETTLEMENTS).reduce(function (arr, key) { return arr.concat(REGION_SETTLEMENTS[key]); }, []);
     var sheet = state.teachers.map(function (t) { return t.settlement; }).filter(Boolean);
@@ -205,28 +194,11 @@
   function matchCat(t, cat) { if (!cat) return true; cat = norm(cat); return norm(t.category).indexOf(cat) !== -1 || norm(t.subcat).indexOf(cat) !== -1; }
   function filteredTeachers() {
     var query = norm(state.q);
-    return state.teachers.filter(function (t) {
+    var list = state.teachers.filter(function (t) {
       var fmtOk = !state.fmt || (state.fmt === 'ონლაინ' ? isOnline(t.online) : state.fmt === 'პირადად' ? isOffline(t.online) && !isOnline(t.online) : state.fmt === 'ორივე' ? norm(t.online) === 'ორივე' : true);
-      return matchCat(t, state.cat) &&
-        (!state.reg || norm(t.region).indexOf(norm(state.reg)) !== -1) &&
-        (!state.settlement || norm(t.settlement).indexOf(norm(state.settlement)) !== -1) &&
-        fmtOk &&
-        (!query || [t.name,t.category,t.subcat,t.region,t.settlement,t.desc].some(function (v) { return norm(v).indexOf(query) !== -1; }));
+      return matchCat(t, state.cat) && (!state.reg || norm(t.region).indexOf(norm(state.reg)) !== -1) && (!state.settlement || norm(t.settlement).indexOf(norm(state.settlement)) !== -1) && fmtOk && (!query || [t.name,t.category,t.subcat,t.region,t.settlement,t.desc].some(function (v) { return norm(v).indexOf(query) !== -1; }));
     });
-  }
-
-  function sortTeachers(list) {
-    var arr = list.slice();
-    var s = state.sort;
-    arr.sort(function (a, b) {
-      var pa = priceNum(a), pb = priceNum(b);
-      if (s === 'priceAsc') return (pa == null ? 999999 : pa) - (pb == null ? 999999 : pb) || a.name.localeCompare(b.name, 'ka');
-      if (s === 'priceDesc') return (pb == null ? -1 : pb) - (pa == null ? -1 : pa) || a.name.localeCompare(b.name, 'ka');
-      if (s === 'nameAsc') return a.name.localeCompare(b.name, 'ka');
-      if (s === 'nameDesc') return b.name.localeCompare(a.name, 'ka');
-      return (b.numId || b.sheetRow || 0) - (a.numId || a.sheetRow || 0);
-    });
-    return arr;
+    return list.sort(function (a, b) { return (b.numId || b.sheetRow || 0) - (a.numId || a.sheetRow || 0); });
   }
 
   function updateFilterLabels() {
@@ -239,13 +211,12 @@
     [['pillCat', state.cat], ['pillReg', state.reg], ['pillSettlement', state.settlement], ['pillFmt', state.fmt]].forEach(function (x) {
       var el = q(x[0]); if (el) el.classList.toggle('active', !!x[1]);
     });
-    var sort = q('sortTeachers'); if (sort) sort.value = state.sort;
   }
 
   function renderTeachersList() {
     var list = q('teachersList'), count = q('resultsCount'), pag = q('pagination');
     if (!list) return;
-    var f = sortTeachers(filteredTeachers());
+    var f = filteredTeachers();
     if (count) count.textContent = f.length + ' მასწავლებელი';
     if (!f.length) {
       list.innerHTML = '<div class="empty-state">ამ მონაცემებით მასწავლებელი ვერ მოიძებნა.</div>';
@@ -294,18 +265,16 @@
 
   function initTeachersUpgrade() {
     if (document.body.dataset.page !== 'teachers') return;
-    addSortControl();
+    removeSortControls();
+    removePopularSeoLinks();
     var params = new URLSearchParams(location.search), seo = window.MZ_SEO || {};
     state.cat = seo.cat || params.get('cat') || '';
     state.reg = seo.reg || params.get('reg') || '';
     state.settlement = seo.settlement || params.get('settlement') || '';
     state.fmt = seo.fmt || params.get('fmt') || '';
-    state.sort = params.get('sort') || 'newest';
     var search = q('teacherSearch');
     if (search && !search.__mzSearch) { search.__mzSearch = true; search.addEventListener('input', function (e) { state.q = e.target.value.trim(); state.page = 1; renderTeachersList(); }); }
-    var sort = q('sortTeachers');
-    if (sort && !sort.__mzSort) { sort.__mzSort = true; sort.addEventListener('change', function (e) { state.sort = e.target.value; state.page = 1; renderTeachersList(); }); }
-    readSheet(true).then(function (list) { state.teachers = list; updateFilterLabels(); renderTeachersList(); });
+    readSheet(true).then(function (list) { state.teachers = list; updateFilterLabels(); renderTeachersList(); removeSortControls(); removePopularSeoLinks(); });
   }
 
   function renderProfile(t) {
@@ -345,21 +314,23 @@
   function renderSimilar(current, list) {
     var old = q('similarTeachersSection'); if (old) old.remove();
     if (!current) return;
-    var similar = list.filter(function (t) { return String(t.id) !== String(current.id); }).map(function (t) {
+    var similar = list.filter(function (t) {
+      return String(t.sheetRow) !== String(current.sheetRow) && String(t.id) !== String(current.id);
+    }).map(function (t) {
       var score = 0;
-      if (current.settlement && norm(t.settlement) === norm(current.settlement)) score += 100;
+      if (current.settlement && norm(t.settlement) === norm(current.settlement)) score += 90;
       if (current.region && norm(t.region) === norm(current.region)) score += 25;
-      if (current.subcat && norm(t.subcat) === norm(current.subcat)) score += 75;
+      if (current.subcat && norm(t.subcat) === norm(current.subcat)) score += 70;
       if (current.category && norm(t.category) === norm(current.category)) score += 45;
       return { t: t, score: score };
-    }).filter(function (x) { return x.score >= 70; }).sort(function (a, b) { return b.score - a.score || (b.t.numId || 0) - (a.t.numId || 0); }).slice(0, 5).map(function (x) { return x.t; });
+    }).filter(function (x) { return x.score >= 45; }).sort(function (a, b) { return b.score - a.score || (b.t.numId || 0) - (a.t.numId || 0); }).slice(0, 5).map(function (x) { return x.t; });
 
     if (!similar.length) return;
-    var href = '/teachers/?cat=' + encodeURIComponent(current.subcat || current.category || '') + (current.settlement ? '&settlement=' + encodeURIComponent(current.settlement) : '');
+    var href = '/teachers/?' + (current.category ? 'cat=' + encodeURIComponent(current.category) : '') + (current.settlement ? '&settlement=' + encodeURIComponent(current.settlement) : '');
     var sec = document.createElement('section');
     sec.className = 'similar-section container';
     sec.id = 'similarTeachersSection';
-    sec.innerHTML = '<div class="section-head similar-head"><div><span class="section-kicker">შერჩეული პროფილები</span><h2>მსგავსი მასწავლებლები</h2><p>იგივე ქალაქში ან მსგავს სფეროში დამატებული პროფილები.</p></div><a href="' + href + '" class="text-link">ყველას ნახვა →</a></div><div class="teachers-grid similar-grid">' + similar.map(renderCard).join('') + '</div>';
+    sec.innerHTML = '<div class="section-head similar-head"><div><span class="section-kicker">შერჩეული პროფილები</span><h2>მსგავსი მასწავლებლები</h2><p>იგივე ქალაქში ან მსგავს სფეროში დამატებული მასწავლებლები.</p></div><a href="' + href + '" class="text-link">ყველას ნახვა →</a></div><div class="similar-mini-grid">' + similar.map(renderMiniCard).join('') + '</div>';
     var body = document.querySelector('.profile-body');
     if (body) body.after(sec);
     else { var foot = document.querySelector('.site-footer'); if (foot) foot.before(sec); }
@@ -380,21 +351,6 @@
     });
   }
 
-  function setErr(id, show) { var el = q('err-' + id), input = q(id); if (el) el.style.display = show ? 'block' : 'none'; if (input) input.classList.toggle('error', !!show); }
-  function validateRegister() {
-    var ok = true;
-    ['name','region','category','phone'].forEach(function (id) { var good = !!val(id); setErr(id, !good); ok = good && ok; });
-    var settlement = val('settlement') === 'სხვა' ? val('customSettlement') : val('settlement');
-    setErr('settlement', !settlement); ok = !!settlement && ok;
-    var priceOk = val('priceType') === 'შეთანხმებით' || !!val('price');
-    setErr('price', !priceOk); ok = priceOk && ok;
-    var descOk = val('desc').length >= 30;
-    setErr('desc', !descOk); ok = descOk && ok;
-    var formatOk = !!checked('format');
-    var err = q('err-format'); if (err) err.style.display = formatOk ? 'none' : 'block'; ok = formatOk && ok;
-    return ok;
-  }
-
   function initRegister() {
     if (document.body.dataset.page !== 'register') return;
     hideRegisterSocials();
@@ -409,28 +365,23 @@
       img.onerror = function () { this.onerror = null; this.src = DEF; };
       if (!String(img.getAttribute('src') || '').trim()) img.src = DEF;
     });
+    document.querySelectorAll('.similar-mini-img img').forEach(function (img) {
+      img.onerror = function () { this.onerror = null; this.src = DEF; };
+      if (!String(img.getAttribute('src') || '').trim()) img.src = DEF;
+    });
     var p = q('profPhoto');
     if (p && (!String(p.getAttribute('src') || '').trim() || p.hidden || p.style.display === 'none')) showImage(p, DEF, 'Moemzade.ge');
   }
 
-  function insertSeoLinks() {
-    if (q('popularSeoLinks')) return;
-    if (document.body.dataset.page !== 'index' && document.body.dataset.page !== 'teachers') return;
-    var sec = document.createElement('section');
-    sec.className = 'section seo-links-section';
-    sec.id = 'popularSeoLinks';
-    sec.innerHTML = '<div class="container"><div class="section-head"><div><span class="section-kicker">პოპულარული ძიებები</span><h2>მასწავლებლები ქალაქისა და სფეროს მიხედვით</h2></div></div><div class="seo-links-grid">' + SEO_LINKS.map(function (x) { return '<a href="' + x[0] + '">' + esc(x[1]) + ' →</a>'; }).join('') + '</div></div>';
-    var footer = document.querySelector('.site-footer'); if (footer) footer.before(sec);
-  }
-
   function init() {
     setFooter();
+    removePopularSeoLinks();
+    removeSortControls();
     hideRegisterSocials();
     installCardClickGuard();
     initRegister();
     initTeachersUpgrade();
     initProfileUpgrade();
-    insertSeoLinks();
     fixImages();
     window.openFilter = openFilter;
     window.closeFilter = closeFilter;
@@ -439,8 +390,8 @@
     window.applyFilter = applyFilter;
     window.changePage = changePage;
     window.openProfile = function (id) { if (id) location.href = '/teacher/?id=' + encodeURIComponent(id); };
-    setTimeout(function () { hideRegisterSocials(); fixImages(); insertSeoLinks(); }, 700);
-    setTimeout(function () { hideRegisterSocials(); fixImages(); hideSocials(); }, 1600);
+    setTimeout(function () { removePopularSeoLinks(); removeSortControls(); hideRegisterSocials(); fixImages(); }, 700);
+    setTimeout(function () { removePopularSeoLinks(); removeSortControls(); hideRegisterSocials(); hideSocials(); fixImages(); }, 1600);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
