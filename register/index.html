@@ -35,6 +35,7 @@
               document.dispatchEvent(new Event('DOMContentLoaded'));
               return loadScript('site-fixes.js?v=20260620-register-fix');
             })
+            .then(function () { return loadScript('submission-endpoint.js?v=20260620-live-endpoint'); })
             .then(function () { return loadScript('clean-routes.js?v=20260620-register-fix'); });
         })
         .catch(function () {
