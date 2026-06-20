@@ -51,6 +51,45 @@
     return ok;
   }
 
+  function showSuccess() {
+    var card = q('formCard');
+    var success = q('successCard');
+    if (card) card.hidden = true;
+    if (success) success.hidden = false;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function postByHiddenForm(data) {
+    // Apps Script web apps are more reliable with a normal form POST than with CORS/fetch.
+    // The server reads e.parameter.payload and appends the row.
+    var frameName = 'mz_submit_frame_' + Date.now();
+    var iframe = document.createElement('iframe');
+    iframe.name = frameName;
+    iframe.style.display = 'none';
+    iframe.setAttribute('aria-hidden', 'true');
+
+    var form = document.createElement('form');
+    form.method = 'POST';
+    form.action = APPS_URL;
+    form.target = frameName;
+    form.style.display = 'none';
+
+    var input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'payload';
+    input.value = JSON.stringify(data);
+    form.appendChild(input);
+
+    document.body.appendChild(iframe);
+    document.body.appendChild(form);
+    form.submit();
+
+    setTimeout(function () {
+      if (form.parentNode) form.parentNode.removeChild(form);
+      if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+    }, 15000);
+  }
+
   window.submitForm = function submitFormToLiveEndpoint() {
     if (!validateAll()) return;
 
@@ -67,6 +106,8 @@
     var settlement = val('settlement') === 'სხვა' ? val('customSettlement') : val('settlement');
 
     var data = {
+      action: 'registerTeacher',
+      submissionId: 'mz_' + Date.now() + '_' + Math.random().toString(36).slice(2),
       name: val('name'),
       category: val('category'),
       subcat: subcat || '',
@@ -87,22 +128,16 @@
 
     if (btn) { btn.disabled = true; btn.textContent = 'იგზავნება...'; }
 
-    fetch(APPS_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(data)
-    }).then(function () {
-      var card = q('formCard');
-      var success = q('successCard');
-      if (card) card.hidden = true;
-      if (success) success.hidden = false;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }).catch(function (err) {
+    try {
+      postByHiddenForm(data);
+      setTimeout(showSuccess, 1200);
+    } catch (err) {
       console.error(err);
       alert('გაგზავნა ვერ მოხერხდა. სცადე თავიდან.');
-    }).finally(function () {
-      if (btn) { btn.disabled = false; btn.textContent = 'პროფილის გაგზავნა ✓'; }
-    });
+    } finally {
+      setTimeout(function () {
+        if (btn) { btn.disabled = false; btn.textContent = 'პროფილის გაგზავნა ✓'; }
+      }, 1500);
+    }
   };
 })();
