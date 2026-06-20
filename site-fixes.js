@@ -5,6 +5,7 @@
   var DEF = 'https://i.ibb.co/3y6km7Z9/711213407-122101682967350935-3629065519639735453-n.jpg';
   var FB = 'https://www.facebook.com/MoemzadeE/';
   var SHEET = '1weL4w0BzXGrYPIczj0kKYFdvE615OIMKSzIpt9Q1Yu0';
+  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxVMDPiywAB_J7dT5foF_Fja1K4blC_XHRHK9pWuGnZU0neLVp2h3D8lGBXXX9GR4JRJw/exec';
   var sheetPromise = null;
   var refreshTimer = null;
 
@@ -15,6 +16,9 @@
   function cleanPhoto(src){ src = String(src || '').trim(); return src || DEF; }
   function price(p,t){ if(!p || t === 'შეთანხმებით') return 'შეთანხმებით'; return p + '₾/' + ({'საათში':'სთ','თვეში':'თვე','კურსი':'კურსი'}[t] || 'სთ'); }
   function approved(v){ return ['კი','yes','true','1'].indexOf(String(v || '').toLowerCase().trim()) > -1; }
+  function val(id){ return q(id)?.value?.trim() || ''; }
+  function checked(name){ return document.querySelector('input[name="'+name+'"]:checked')?.value || ''; }
+  function numericId(id){ var n = parseInt(String(id || '').replace(/[^0-9]/g,''), 10); return Number.isFinite(n) ? n : 0; }
 
   function setFooter(){
     var html = '<footer class="site-footer"><div class="container footer-grid"><div><a href="index.html" class="footer-brand"><span class="footer-brand-mark">მ</span><span class="footer-brand-name">moemzade</span><span class="footer-brand-dot">.ge</span></a><p>საქართველოს მასწავლებლების, კურსებისა და ტრენერების უფასო საძიებო პლატფორმა.</p></div><div><h3>გვერდები</h3><a href="index.html">მთავარი</a><a href="teachers.html">მასწავლებლები</a><a href="register.html">პროფილის დამატება</a></div><div><h3>კონტაქტი</h3><a href="'+FB+'" target="_blank" rel="noopener" class="footer-social">📘 Facebook გვერდი</a></div></div><div class="container footer-bottom"><span>© 2026 Moemzade.ge</span><span>Made in Georgia</span></div></footer>';
@@ -78,7 +82,8 @@
     }
   }
 
-  function readSheet(){
+  function readSheet(force){
+    if(force) sheetPromise = null;
     if(sheetPromise) return sheetPromise;
     sheetPromise = fetch('https://docs.google.com/spreadsheets/d/'+SHEET+'/gviz/tq?tqx=out:json&sheet=teachers&t='+Date.now(), {cache:'no-store'})
       .then(function(r){ return r.text(); })
@@ -93,19 +98,26 @@
           };
           x.row = idx;
           x.sheetRow = idx + 2;
-          x.id = String(x.id || ('row-'+x.sheetRow)).trim();
+          x.id = String(x.id || '').trim();
           x.nameKey = norm(x.name);
           x.subKey = norm(x.sub || x.cat);
           x.priceKey = compact(price(x.price, x.pt));
+          x.numId = numericId(x.id);
           return x;
         }).filter(function(x){ return x.name && approved(x.ok); });
       });
     return sheetPromise;
   }
 
+  function nextId(list){
+    var max = 0;
+    (list || []).forEach(function(x){ if(x.numId > max) max = x.numId; });
+    return String(max + 1);
+  }
+
   function cardData(card){
     return {
-      id: String(card.getAttribute('data-teacher-id') || '').trim(),
+      id: String(card.getAttribute('data-teacher-id') || card.getAttribute('data-fixed-id') || '').trim(),
       name: norm(card.querySelector('.tc-name')?.textContent || ''),
       sub: norm(card.querySelector('.tc-sub')?.textContent || ''),
       price: compact(card.querySelector('.tc-price')?.textContent || '')
@@ -125,6 +137,13 @@
     var byFull = byNameSub.filter(function(x){ return !c.price || x.priceKey === c.price; });
     if(byFull.length) return byFull[0];
     return exact || null;
+  }
+
+  function teacherUrl(x){
+    var id = x && x.id ? x.id : '';
+    var url = 'teacher.html?id=' + encodeURIComponent(id);
+    if(x && x.sheetRow) url += '&row=' + encodeURIComponent(x.sheetRow);
+    return url;
   }
 
   function applyCardRoutes(){
@@ -149,17 +168,27 @@
 
   function installCardClickGuard(){
     document.addEventListener('click', function(event){
-      var card = event.target.closest && event.target.closest('.teacher-card[data-fixed-id]');
+      var card = event.target.closest && event.target.closest('.teacher-card');
       if(!card) return;
-      var id = card.getAttribute('data-fixed-id');
-      if(!id) return;
-      var row = card.getAttribute('data-fixed-row') || '';
       event.preventDefault();
       event.stopPropagation();
       event.stopImmediatePropagation();
-      var url = 'teacher.html?id=' + encodeURIComponent(id);
-      if(row) url += '&row=' + encodeURIComponent(row);
-      location.href = url;
+
+      var fixedId = card.getAttribute('data-fixed-id');
+      var fixedRow = card.getAttribute('data-fixed-row');
+      if(fixedId){
+        location.href = 'teacher.html?id=' + encodeURIComponent(fixedId) + (fixedRow ? '&row=' + encodeURIComponent(fixedRow) : '');
+        return;
+      }
+
+      readSheet(true).then(function(list){
+        var x = resolveCard(card, list);
+        if(x) location.href = teacherUrl(x);
+        else {
+          var fallback = card.getAttribute('data-teacher-id') || '';
+          if(fallback) location.href = 'teacher.html?id=' + encodeURIComponent(fallback);
+        }
+      });
     }, true);
   }
 
@@ -220,7 +249,7 @@
     var requestedRow = params.get('row') || '';
     if(!requestedId && !requestedRow) return;
 
-    readSheet().then(function(list){
+    readSheet(true).then(function(list){
       var found = null;
       if(requestedRow){
         found = list.find(function(x){ return String(x.sheetRow) === String(requestedRow) || String(x.row) === String(requestedRow); });
@@ -228,23 +257,91 @@
       if(!found && requestedId){
         found = list.find(function(x){ return String(x.id) === String(requestedId); });
       }
-      if(!found && /^\d+$/.test(requestedId || '')){
-        found = list.find(function(x){ return String(x.sheetRow) === String(Number(requestedId)) || String(x.row) === String(Number(requestedId)); });
-      }
       if(found) renderProfile(found);
     }).catch(function(){ fixImages(); hideProfileSocials(); });
+  }
+
+  function setErr(id, show){
+    var el = q('err-' + id);
+    var input = q(id);
+    if(el) el.style.display = show ? 'block' : 'none';
+    if(input) input.classList.toggle('error', !!show);
+  }
+
+  function validateRegister(){
+    var ok = true;
+    ['name','region','category','phone'].forEach(function(id){ var good = !!val(id); setErr(id, !good); ok = good && ok; });
+    var settlement = val('settlement') === 'სხვა' ? val('customSettlement') : val('settlement');
+    setErr('settlement', !settlement); ok = !!settlement && ok;
+    var priceOk = val('priceType') === 'შეთანხმებით' || !!val('price');
+    setErr('price', !priceOk); ok = priceOk && ok;
+    var descOk = val('desc').length >= 30;
+    setErr('desc', !descOk); ok = descOk && ok;
+    var formatOk = !!checked('format');
+    var err = q('err-format'); if(err) err.style.display = formatOk ? 'none' : 'block';
+    ok = formatOk && ok;
+    return ok;
+  }
+
+  async function submitNumericRegister(){
+    if(!validateRegister()) return;
+    var uploadStatus = q('uploadStatus');
+    if(uploadStatus && uploadStatus.classList.contains('uploading')){
+      uploadStatus.textContent = '⏳ გთხოვთ დაიცადოთ, ფოტო იტვირთება...';
+      return;
+    }
+    var btn = q('submitBtn');
+    var subcat = val('subcat') === 'სხვა' ? val('customSubcat') : val('subcat');
+    var settlement = val('settlement') === 'სხვა' ? val('customSettlement') : val('settlement');
+    try{
+      if(btn){ btn.disabled = true; btn.textContent = 'იგზავნება...'; }
+      var list = await readSheet(true).catch(function(){ return []; });
+      var data = {
+        id: nextId(list),
+        name: val('name'), category: val('category'), subcat: subcat, region: val('region'), settlement: settlement,
+        price: val('price'), priceType: val('priceType') || 'საათში', phone: val('phone'),
+        instagram: '', facebook: '', desc: val('desc'),
+        format: checked('format'), online: checked('format'), photo: val('photoUrl'),
+        date: new Date().toLocaleString('ka-GE'), approved: 'არა'
+      };
+      await fetch(APPS_SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'}, body: JSON.stringify(data) });
+      q('formCard')?.setAttribute('hidden','');
+      q('successCard')?.removeAttribute('hidden');
+      window.scrollTo({top:0, behavior:'smooth'});
+    }catch(e){
+      console.error(e);
+      alert('გაგზავნა ვერ მოხერხდა. სცადე თავიდან.');
+    }finally{
+      if(btn){ btn.disabled = false; btn.textContent = 'პროფილის გაგზავნა ✓'; }
+    }
+  }
+
+  function installRegisterSubmitGuard(){
+    if(document.body.getAttribute('data-page') !== 'register') return;
+    window.submitForm = submitNumericRegister;
+    var btn = q('submitBtn');
+    if(btn && !btn.__moemzadeSubmitGuard){
+      btn.__moemzadeSubmitGuard = true;
+      btn.addEventListener('click', function(event){
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        submitNumericRegister();
+      }, true);
+    }
   }
 
   function init(){
     setFooter();
     hideRegisterSocials();
+    installRegisterSubmitGuard();
     installCardClickGuard();
     watchCardContainers();
     fixImages();
     applyCardRoutes();
     profileFix();
-    setTimeout(function(){ hideRegisterSocials(); fixImages(); applyCardRoutes(); }, 700);
-    setTimeout(function(){ hideRegisterSocials(); fixImages(); applyCardRoutes(); hideProfileSocials(); }, 1600);
+    setTimeout(function(){ hideRegisterSocials(); installRegisterSubmitGuard(); fixImages(); applyCardRoutes(); }, 700);
+    setTimeout(function(){ hideRegisterSocials(); installRegisterSubmitGuard(); fixImages(); applyCardRoutes(); hideProfileSocials(); }, 1600);
   }
 
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
