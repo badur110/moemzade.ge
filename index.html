@@ -12,6 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="site-fixes.css">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://moemzade.ge/">
   <meta property="og:title" content="Moemzade.ge — იპოვე შენი მასწავლებელი">
@@ -136,7 +137,10 @@
   <footer class="site-footer">
     <div class="container footer-grid">
       <div>
-        <img src="logo.svg" alt="Moemzade.ge" class="footer-logo">
+        <a href="index.html" class="footer-brand" aria-label="Moemzade.ge მთავარი გვერდი">
+          <span class="footer-brand-mark">მ</span>
+          <span class="footer-brand-name">moemzade</span><span class="footer-brand-dot">.ge</span>
+        </a>
         <p>საქართველოს მასწავლებლების, კურსებისა და ტრენერების უფასო საძიებო პლატფორმა.</p>
       </div>
       <div>
@@ -147,15 +151,13 @@
       </div>
       <div>
         <h3>კონტაქტი</h3>
-        <a href="https://www.facebook.com/profile.php?id=61575230007824" target="_blank" rel="noopener">Facebook გვერდი</a>
+        <a href="https://www.facebook.com/MoemzadeE/" target="_blank" rel="noopener" class="footer-social">📘 Facebook გვერდი</a>
       </div>
     </div>
-    <div class="container footer-bottom">
-      <span>© 2026 Moemzade.ge</span>
-      <span>Made in Georgia</span>
-    </div>
+    <div class="container footer-bottom"><span>© 2026 Moemzade.ge</span><span>Made in Georgia</span></div>
   </footer>
 
   <script src="script.js"></script>
+  <script src="site-fixes.js"></script>
 </body>
 </html>
