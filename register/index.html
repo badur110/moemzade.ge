@@ -28,15 +28,16 @@
           document.body.className = 'register-page';
           document.body.dataset.page = 'register';
 
-          return loadScript('script.js?v=20260620-register-fix')
+          return loadScript('data-source.js?v=20260620-new-sheet')
+            .then(function () { return loadScript('script.js?v=20260620-new-sheet'); })
             .then(function () {
               // script.js was loaded after DOMContentLoaded on clean URL pages,
               // so manually trigger its initializer once for this injected page.
               document.dispatchEvent(new Event('DOMContentLoaded'));
-              return loadScript('site-fixes.js?v=20260620-register-fix');
+              return loadScript('site-fixes.js?v=20260620-new-sheet');
             })
-            .then(function () { return loadScript('submission-endpoint.js?v=20260620-endpoint-2'); })
-            .then(function () { return loadScript('clean-routes.js?v=20260620-register-fix'); });
+            .then(function () { return loadScript('submission-endpoint.js?v=20260620-new-endpoint'); })
+            .then(function () { return loadScript('clean-routes.js?v=20260620-new-sheet'); });
         })
         .catch(function () {
           location.href = '../register.html';
