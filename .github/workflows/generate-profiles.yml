@@ -3,10 +3,10 @@ name: Generate profile pages
 on:
   workflow_dispatch:
   schedule:
-    # Auto-generate approved teacher profile pages every 15 minutes.
+    # Auto-generate approved teacher profile pages every 5 minutes.
     # When a teacher is approved in Google Sheets, their /teacher/{id}/ page
     # will be generated automatically on the next scheduled run.
-    - cron: '*/15 * * * *'
+    - cron: '*/5 * * * *'
 
 permissions:
   contents: write
