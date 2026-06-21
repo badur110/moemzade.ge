@@ -7,4 +7,4 @@ Allow: /
 User-agent: Twitterbot
 Allow: /
 
-Sitemap: https://www.moemzade.ge/sitemap.xml
+Sitemap: https://moemzade.ge/sitemap.xml
