@@ -1,12 +1,15 @@
-name: Generate profile pages
+name: Generate profile and SEO pages
 
 on:
   workflow_dispatch:
   schedule:
-    # Auto-generate approved teacher profile pages every 5 minutes.
-    # When a teacher is approved in Google Sheets, their /teacher/{id}/ page
-    # will be generated automatically on the next scheduled run.
+    # Auto-generate approved teacher profile pages and SEO landing pages every 5 minutes.
     - cron: '*/5 * * * *'
+  push:
+    branches: [ main ]
+    paths:
+      - 'scripts/generate-teacher-pages.mjs'
+      - '.github/workflows/generate-profiles.yml'
 
 permissions:
   contents: write
@@ -25,10 +28,10 @@ jobs:
       - run: |
           git config user.name "moemzade-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add teacher sitemap.xml
+          git add teacher teachers sitemap.xml
           if git diff --cached --quiet; then
-            echo "No generated profile changes"
+            echo "No generated page changes"
           else
-            git commit -m "Generate profile pages"
+            git commit -m "Generate profile and SEO pages"
             git push
           fi
