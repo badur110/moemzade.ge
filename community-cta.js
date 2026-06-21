@@ -1,12 +1,31 @@
-// Moemzade.ge — Facebook group / community CTAs + support links
+// Moemzade.ge — Facebook group / community CTAs + support links + Google Analytics
 (function () {
   'use strict';
 
   var GROUP_URL = 'https://www.facebook.com/groups/moemzade.ge';
   var PAGE_URL = 'https://www.facebook.com/MoemzadeE/';
+  var GA_ID = 'G-72C6QZZKNF';
 
   function qs(sel, root) { return (root || document).querySelector(sel); }
   function qsa(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+
+  function loadAnalytics() {
+    if (!GA_ID || window.__mzGaLoaded) return;
+    window.__mzGaLoaded = true;
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
+
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(GA_ID);
+    document.head.appendChild(s);
+
+    window.gtag('js', new Date());
+    window.gtag('config', GA_ID, {
+      page_path: window.location.pathname + window.location.search,
+      page_title: document.title
+    });
+  }
 
   function findFooterColumn(footer, titlePart) {
     var found = null;
@@ -113,6 +132,7 @@
   }
 
   function init() {
+    loadAnalytics();
     addFooterGroupLink();
     addRegisterSuccessGroup();
     addHomeCommunitySection();
