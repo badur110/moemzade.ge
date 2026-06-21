@@ -5,6 +5,15 @@
   var SHEET = '1weL4w0BzXGrYPIczj0kKYFdvE615OIMKSzIpt9Q1Yu0';
   var cache = null;
 
+  function ensureResponsive(){
+    if(document.querySelector('link[href*="mobile-responsive.css"]')) return;
+    var l=document.createElement('link');
+    l.rel='stylesheet';
+    l.href='mobile-responsive.css?v=20260621-mobile';
+    document.head.appendChild(l);
+  }
+  ensureResponsive();
+
   function norm(v){ return String(v || '').toLowerCase().replace(/\s+/g,' ').trim(); }
   function compact(v){ return norm(v).replace(/[\s₾\/\-—]+/g,''); }
   function ok(v){ return ['კი','yes','true','1'].indexOf(String(v || '').toLowerCase().trim()) !== -1; }
