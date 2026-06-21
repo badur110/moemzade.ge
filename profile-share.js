@@ -34,6 +34,15 @@
   function shareText(data) {
     return 'ნახე ეს მასწავლებელი Moemzade.ge-ზე — ' + data.name + ', ' + data.subtitle;
   }
+  function openFacebookShare(data) {
+    var shareUrl = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(data.url);
+    var w = 640;
+    var h = 720;
+    var left = Math.max(0, Math.round((screen.width - w) / 2));
+    var top = Math.max(0, Math.round((screen.height - h) / 2));
+    var win = window.open(shareUrl, 'moemzadeProfileShare', 'width=' + w + ',height=' + h + ',left=' + left + ',top=' + top + ',noopener,noreferrer');
+    if (!win) location.href = shareUrl;
+  }
   async function copyLink(data) {
     try {
       await navigator.clipboard.writeText(data.url);
@@ -56,9 +65,9 @@
       '<div class="share-panel-body">' +
         '<div class="share-preview-card"><img src="' + attr(data.photo) + '" alt="' + attr(data.name) + '" onerror="this.onerror=null;this.src=\'' + DEFAULT_PHOTO + '\'"><div><strong>' + esc(data.name) + '</strong><span>' + esc(data.subtitle) + '</span></div></div>' +
         '<div class="share-actions">' +
-          '<button class="share-action primary" type="button" id="shareCopyBtn">📋 ლინკის კოპირება</button>' +
+          '<button class="share-action primary" type="button" id="shareFacebookNow">📘 Facebook-ზე გაზიარება</button>' +
+          '<button class="share-action" type="button" id="shareCopyBtn">📋 ლინკის კოპირება</button>' +
           '<a class="share-action whatsapp" target="_blank" rel="noopener" href="https://wa.me/?text=' + encodedText + '%20' + encodedUrl + '">💬 WhatsApp</a>' +
-          '<a class="share-action" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=' + encodedUrl + '">📘 Facebook</a>' +
           '<a class="share-action" target="_blank" rel="noopener" href="https://www.messenger.com/t/?link=' + encodedUrl + '">📩 Messenger</a>' +
         '</div><div class="share-copy-done" id="shareCopyDone">ლინკი დაკოპირდა ✓</div>' +
       '</div></div>';
@@ -66,14 +75,12 @@
     div.querySelector('.share-panel-close').addEventListener('click', function () { div.remove(); });
     div.addEventListener('click', function (e) { if (e.target === div) div.remove(); });
     q('shareCopyBtn').addEventListener('click', function () { copyLink(data); });
+    q('shareFacebookNow').addEventListener('click', function () { openFacebookShare(data); });
   }
-  async function shareProfile() {
+  function shareProfile() {
     var data = profileData();
-    var payload = { title: data.name + ' — Moemzade.ge', text: shareText(data), url: data.url };
-    if (navigator.share) {
-      try { await navigator.share(payload); return; } catch (e) {}
-    }
-    openPanel(data);
+    // The primary share action is Facebook: it opens the native Facebook share dialog directly.
+    openFacebookShare(data);
   }
   function addShareButton() {
     if (q('shareProfileBtn')) return;
@@ -83,7 +90,7 @@
     btn.type = 'button';
     btn.id = 'shareProfileBtn';
     btn.className = 'share-profile-btn';
-    btn.textContent = '🔗 პროფილის გაზიარება';
+    btn.textContent = '📘 Facebook-ზე გაზიარება';
     btn.addEventListener('click', shareProfile);
     box.appendChild(btn);
   }
