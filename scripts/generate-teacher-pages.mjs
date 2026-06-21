@@ -137,7 +137,8 @@ function pageHtml(t, all) {
   ${similarSection(t, all)}
   <footer class="site-footer"><div class="container footer-grid"><div><img src="logo.svg" alt="Moemzade.ge" class="footer-logo"><p>საქართველოს მასწავლებლების, კურსებისა და ტრენერების უფასო საძიებო პლატფორმა.</p></div><div><h3>გვერდები</h3><a href="/">მთავარი</a><a href="/teachers/">მასწავლებლები</a><a href="/register/">პროფილის დამატება</a></div><div><h3>კონტაქტი</h3><a href="${FB}" target="_blank" rel="noopener" class="footer-social">Facebook გვერდი</a></div></div><div class="container footer-bottom"><span>© 2026 Moemzade.ge</span><span>Made in Georgia</span></div></footer>
   <script>window.MZ_PROFILE=${JSON.stringify({ id: t.id, name: t.name, subtitle: subject(t) + (place(t) ? ' · ' + place(t) : ''), photo })};</script>
-  <script src="profile-share.js?v=20260621-share"></script>
+  <script src="profile-share.js?v=20260621-fb-direct"></script>
+  <script src="community-cta.js?v=20260621-group2"></script>
 </body>
 </html>`;
 }
