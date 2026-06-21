@@ -3,22 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <base href="/">
   <title>გვერდი ვერ მოიძებნა — Moemzade.ge</title>
   <meta name="robots" content="noindex">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <style>
+    body{font-family:'Noto Sans Georgian',system-ui,sans-serif;background:#F7FAF7;color:#10231d;margin:0;}
+    .nf-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px 18px;background:radial-gradient(circle at 80% 10%,rgba(31,190,145,.18),transparent 34%),#F7FAF7;}
+    .nf-card{width:min(560px,100%);background:#fff;border:1px solid rgba(15,110,86,.12);border-radius:28px;box-shadow:0 22px 70px rgba(9,46,37,.12);padding:42px 34px;text-align:center;}
+    .nf-logo{height:44px;width:auto;margin-bottom:24px;}
+    .nf-icon{width:72px;height:72px;border-radius:24px;display:inline-flex;align-items:center;justify-content:center;background:#E8F8F3;color:#0F6E56;font-size:34px;font-weight:800;margin-bottom:16px;}
+    h1{font-size:30px;line-height:1.2;margin:0 0 10px;font-weight:800;}
+    p{color:#66756f;line-height:1.75;margin:0 0 24px;}
+    .nf-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+    .nf-btn{display:inline-flex;align-items:center;justify-content:center;border-radius:14px;padding:13px 18px;text-decoration:none;font-weight:800;border:1px solid rgba(15,110,86,.12);}
+    .nf-primary{background:#0F6E56;color:#fff;box-shadow:0 12px 30px rgba(15,110,86,.2);}
+    .nf-soft{background:#F2F6F4;color:#0F6E56;}
+  </style>
+  <script>
+    (function(){
+      var path = window.location.pathname || '';
+      var match = path.match(/^\/teacher\/(\d+)\/?$/);
+      if (match) {
+        window.location.replace('/teacher/?id=' + encodeURIComponent(match[1]));
+      }
+    })();
+  </script>
 </head>
 <body>
-  <main class="register-body container">
-    <div class="success-card" style="display:block;margin-top:70px;">
-      <div class="success-icon">?</div>
+  <main class="nf-wrap">
+    <section class="nf-card">
+      <img src="logo.svg" alt="Moemzade.ge" class="nf-logo">
+      <div class="nf-icon">?</div>
       <h1>გვერდი ვერ მოიძებნა</h1>
-      <p>შესაძლოა ბმული შეიცვალა ან არასწორად არის შეყვანილი.</p>
-      <a href="index.html" class="btn btn-primary">მთავარ გვერდზე დაბრუნება</a>
-    </div>
+      <p>შესაძლოა ბმული ჯერ არ არის განახლებული ან გვერდი დროებით მიუწვდომელია.</p>
+      <div class="nf-actions">
+        <a href="/" class="nf-btn nf-primary">მთავარ გვერდზე დაბრუნება</a>
+        <a href="/teachers/" class="nf-btn nf-soft">მასწავლებლების ნახვა</a>
+      </div>
+    </section>
   </main>
 </body>
 </html>
