@@ -1,28 +1,66 @@
-// Moemzade.ge — Facebook group / community CTAs
+// Moemzade.ge — Facebook group / community CTAs + support links
 (function () {
   'use strict';
 
   var GROUP_URL = 'https://www.facebook.com/groups/moemzade.ge';
+  var PAGE_URL = 'https://www.facebook.com/MoemzadeE/';
 
   function qs(sel, root) { return (root || document).querySelector(sel); }
   function qsa(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
 
+  function findFooterColumn(footer, titlePart) {
+    var found = null;
+    qsa('h3', footer).forEach(function (h) {
+      if ((h.textContent || '').trim().includes(titlePart)) found = h.parentElement;
+    });
+    return found;
+  }
+
   function addFooterGroupLink() {
     qsa('.site-footer').forEach(function (footer) {
-      if (footer.querySelector('[data-mz-group-link]')) return;
-      var contactCol = null;
-      qsa('h3', footer).forEach(function (h) {
-        if ((h.textContent || '').trim().includes('კონტაქტ')) contactCol = h.parentElement;
-      });
+      if (footer.querySelector('[data-mz-footer-enhanced]')) return;
+      footer.setAttribute('data-mz-footer-enhanced', '1');
+
+      var pagesCol = findFooterColumn(footer, 'გვერდ');
+      if (pagesCol) {
+        if (!pagesCol.querySelector('a[href="/faq/"]')) {
+          var faq = document.createElement('a');
+          faq.href = '/faq/';
+          faq.textContent = 'ხშირად დასმული კითხვები';
+          pagesCol.appendChild(faq);
+        }
+        if (!pagesCol.querySelector('a[href="/rules/"]')) {
+          var rules = document.createElement('a');
+          rules.href = '/rules/';
+          rules.textContent = 'წესები და კონფიდენციალურობა';
+          pagesCol.appendChild(rules);
+        }
+      }
+
+      var contactCol = findFooterColumn(footer, 'კონტაქტ');
       if (!contactCol) return;
-      var a = document.createElement('a');
-      a.href = GROUP_URL;
-      a.target = '_blank';
-      a.rel = 'noopener';
-      a.className = 'footer-social footer-group-link';
-      a.setAttribute('data-mz-group-link', '1');
-      a.textContent = '👥 Moemzade ჯგუფი';
-      contactCol.appendChild(a);
+
+      if (!contactCol.querySelector('[data-mz-page-link]')) {
+        var page = document.createElement('a');
+        page.href = PAGE_URL;
+        page.target = '_blank';
+        page.rel = 'noopener';
+        page.className = 'footer-social';
+        page.setAttribute('data-mz-page-link', '1');
+        page.textContent = '📘 Facebook გვერდი';
+        if (!qsa('a', contactCol).some(function(a){return a.href === PAGE_URL;})) contactCol.appendChild(page);
+      }
+
+      if (!contactCol.querySelector('[data-mz-group-link]')) {
+        var a = document.createElement('a');
+        a.href = GROUP_URL;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.className = 'footer-social footer-group-link';
+        a.setAttribute('data-mz-group-link', '1');
+        a.textContent = '👥 Moemzade ჯგუფი';
+        contactCol.appendChild(a);
+      }
     });
   }
 
@@ -34,7 +72,7 @@
     box.setAttribute('data-mz-success-group', '1');
     box.innerHTML = '<div class="success-community-icon">👥</div>' +
       '<div class="success-community-copy"><strong>შემოუერთდი ჩვენს Facebook ჯგუფს</strong>' +
-      '<p>იქ ხშირად შემოდიან მშობლები და მოსწავლეები, წერენ მოთხოვნებს და ეძებენ მასწავლებლებს. შენს პროფილს იქაც გაუზიარებ და უფრო მეტ ადამიანს მიაღწევ.</p></div>' +
+      '<p>ჯგუფში ხშირად შემოდიან მშობლები და მოსწავლეები, წერენ მოთხოვნებს და ეძებენ მასწავლებლებს. შეუერთდი, რომ მეტი ადამიანი გიპოვოს.</p></div>' +
       '<a class="btn btn-primary success-community-btn" target="_blank" rel="noopener" href="' + GROUP_URL + '">ჯგუფში გაწევრიანება →</a>';
     var back = card.querySelector('a.btn');
     if (back) card.insertBefore(box, back);
