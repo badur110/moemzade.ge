@@ -129,6 +129,7 @@ function pageHtml(t, all) {
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="site-fixes.css">
   <link rel="stylesheet" href="teacher-share.css">
+  <link rel="stylesheet" href="mobile-responsive.css?v=20260621-mobile">
 </head>
 <body data-page="profile">
   <nav class="nav" aria-label="მთავარი ნავიგაცია"><div class="nav-inner"><a href="/" class="brand"><img src="logo.svg" alt="Moemzade.ge" class="brand-img"></a><div class="nav-links"><a href="/teachers/">← მასწავლებლები</a><a href="/register/" class="btn btn-primary btn-small">+ პროფილის დამატება</a></div></div></nav>
