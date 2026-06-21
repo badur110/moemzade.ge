@@ -21,7 +21,7 @@
       a.rel = 'noopener';
       a.className = 'footer-social footer-group-link';
       a.setAttribute('data-mz-group-link', '1');
-      a.textContent = '👥 Facebook ჯგუფი';
+      a.textContent = '👥 Moemzade ჯგუფი';
       contactCol.appendChild(a);
     });
   }
@@ -33,8 +33,8 @@
     box.className = 'success-community-box';
     box.setAttribute('data-mz-success-group', '1');
     box.innerHTML = '<div class="success-community-icon">👥</div>' +
-      '<div class="success-community-copy"><strong>შემოუერთდი Moemzade ჯგუფს</strong>' +
-      '<p>ჯგუფში შეგიძლია მიიღო შეკითხვები, იპოვო მოსწავლეები და ნახო ახალი მოთხოვნები.</p></div>' +
+      '<div class="success-community-copy"><strong>შემოუერთდი ჩვენს Facebook ჯგუფს</strong>' +
+      '<p>იქ ხშირად შემოდიან მშობლები და მოსწავლეები, წერენ მოთხოვნებს და ეძებენ მასწავლებლებს. შენს პროფილს იქაც გაუზიარებ და უფრო მეტ ადამიანს მიაღწევ.</p></div>' +
       '<a class="btn btn-primary success-community-btn" target="_blank" rel="noopener" href="' + GROUP_URL + '">ჯგუფში გაწევრიანება →</a>';
     var back = card.querySelector('a.btn');
     if (back) card.insertBefore(box, back);
@@ -52,9 +52,9 @@
     section.setAttribute('data-mz-home-community', '1');
     section.innerHTML = '<div class="container community-card">' +
       '<div><span class="section-kicker">Moemzade საზოგადოება</span>' +
-      '<h2>შეუერთდი მასწავლებლებისა და მოსწავლეების ჯგუფს</h2>' +
-      '<p>Facebook ჯგუფში მარტივად იპოვი ახალ მოთხოვნებს, გაუზიარებ შენს პროფილს და უფრო მეტ ადამიანს მიაწვდენ ხმას.</p></div>' +
-      '<a href="' + GROUP_URL + '" target="_blank" rel="noopener" class="btn btn-primary community-btn">👥 ჯგუფში გაწევრიანება</a>' +
+      '<h2>შემოდი ჯგუფში — აქ უფრო სწრაფად პოულობენ მასწავლებელს</h2>' +
+      '<p>ჯგუფში შეგიძლია დაწერო რა გჭირდება, ნახო ახალი პროფილები, გაუზიარო მასწავლებელი მეგობარს და პირდაპირ იპოვო ადამიანი, ვინც რეალურად დაგეხმარება.</p></div>' +
+      '<a href="' + GROUP_URL + '" target="_blank" rel="noopener" class="btn btn-primary community-btn">👥 Facebook ჯგუფში შესვლა</a>' +
       '</div>';
     if (dark) main.insertBefore(section, dark);
     else main.appendChild(section);
@@ -70,7 +70,7 @@
     a.rel = 'noopener';
     a.className = 'register-group-pill';
     a.setAttribute('data-mz-register-group', '1');
-    a.textContent = '👥 შეუერთდი Facebook ჯგუფს';
+    a.textContent = '👥 შემოდი ჯგუფში და იპოვე მოსწავლეები';
     hero.appendChild(a);
   }
 
@@ -81,6 +81,9 @@
     addFloatingGroupForRegister();
     setTimeout(addFooterGroupLink, 800);
     setTimeout(addRegisterSuccessGroup, 800);
+    setTimeout(addHomeCommunitySection, 800);
+    setTimeout(addFloatingGroupForRegister, 800);
+    setTimeout(addRegisterSuccessGroup, 1800);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
